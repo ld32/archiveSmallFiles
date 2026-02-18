@@ -6,15 +6,14 @@ git clone https://github.com/ld32/archieveSmallFiles.git
 
 export PATH=$PWD/archiveSmallFiles/bin:$PATH
 
+```
 ## Prepare a testing data 
 $ createTestData.sh 2 2 2
-```
 ...
 Test data generation complete. It is in /n/scratch/TestingData
 
 ## To scan folders:
 $ sudoScanFolders.sh TestingData/ 1 55
-```
 ...
 Folder count matches expected value: 55. Total folders found: 55.
 
@@ -24,7 +23,6 @@ archiveFolders.sh tar local pass1
 
 ## Some folders might not work due to permission or some other reason. Let's find the folders not done yet
 $ findFoldersNotDoneArchiving.sh pass1
-```
 ...
 Actual folders: 55
 Done folders: 54
@@ -41,10 +39,8 @@ sudoCorrectPermission.sh pass2 4
 ## To check archives
 $ checkArchives.sh tar local pass
 
-
 ## Some folders might not work due to permission or some other reason. Let's find the folders not done yet
 $ findFoldersNotDoneChecking.sh pass1
-```
 ...
 Actual folders: 55
 Done folders: 54
@@ -58,6 +54,7 @@ sudoCorrectPermission.sh pass2 4
 
 ## To randomly un-archieve 10 folder and compare with original
 randomCheck.sh tar pass1 10
+```
 
 # Working with real data
 
