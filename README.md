@@ -44,7 +44,7 @@ $ checkArchives.sh tar local pass
 
 ## Some folders might not work due to permission or some other reason. Let's find the folders not done yet
 $ findFoldersNotDoneChecking.sh pass1
-`
+```
 ...
 Actual folders: 55
 Done folders: 54
