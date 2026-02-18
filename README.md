@@ -6,6 +6,8 @@ git clone https://github.com/ld32/archieveSmallFiles.git
 
 export PATH=$PWD/archiveSmallFiles/bin:$PATH
 
+## Practice with testing data
+
 ```
 ## Prepare a testing data 
 $ createTestData.sh 2 2 2
@@ -58,6 +60,7 @@ randomCheck.sh tar pass1 10
 
 # Working with real data
 
+```
 ## To scan folders:
 sudoScanFolders.sh TestingData/ 20 55000000
 
@@ -72,4 +75,4 @@ randomCheck.sh tar pass1 1000
 
 
 
-
+```
