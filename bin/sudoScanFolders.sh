@@ -117,6 +117,11 @@ for jIndex in $(seq 1 $nJobs); do
     awk -v jIndex="$jIndex" -v nJobs="$nJobs" '( NR - 1 ) % nJobs == jIndex - 1' "$logDir/folders.txt" > "$logDir/folders_part_$jIndex"
 done
 
+cat $tempFile.*.err >&2
+
+echo "First 5 rows of $folders:": 
+head -n 5 $folders
+
 if [[ $count -ne $folderCount ]]; then
     echo "Error: Folder count mismatch. Expected $folderCount, acutal $count."
     echo "Please check the error file $tempFile.*.err for details."
@@ -125,10 +130,3 @@ if [[ $count -ne $folderCount ]]; then
 else 
     echo "Folder count matches expected value: $folderCount. Total folders found: $count."
 fi
-
-cat $tempFile.*.err >&2
-
-echo "First 5 rows of $folders:": 
-head -n 5 $folders
-
-echo All done

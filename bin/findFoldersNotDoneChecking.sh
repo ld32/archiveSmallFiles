@@ -18,7 +18,7 @@ fi
 
 sFolder=`head -n 1 $logDir/folders.txt`
 
-cat $logDir/done.$logDir.*.txt $logDir/done.check.*.txt | sort | uniq > $logDir/done.all.txt 
+cat $logDir/done.check.$logDir.*.txt | sort | uniq > $logDir/done.all.txt 
 
 grep -Fxv -f $logDir/done.all.txt $logDir/folders.txt > $logDir/notDoneFolders.txt 
 
@@ -49,18 +49,33 @@ if [ -f $logDir/notDoneFolders.txt ]; then
     
     nextPass=pass$(( ${logDir#pass} + 1 ))
 
-    if [ -f $logDir/$nextPass.folders.txt ]; then 
+    if [ -f $nextPass/folders.txt ]; then 
         echo "Next pass folders.txt already exists. It is renamed."
-        mv $logDir/$nextPass.folders.txt $logDir/$nextPass.folders.txt.$(date '+%Y-%m-%d_%H-%M-%S_%4N')
+        mv $nextPass/folders.txt $nextPass/folders.txt.$(date '+%Y-%m-%d_%H-%M-%S_%4N')
     fi
 
-    head -n 1 $logDir/folders.txt > $logDir/$nextPass.folders.txt
+    if [ ! -d $nextPass ]; then 
+        mkdir -p $nextPass
+    fi
 
-    cat $logDir/notDoneFolders.txt >> ${logDir/$pass/$nextPass}/folders.txt
+    # Check if the first row is the same
+    first1=$(head -n 1 $logDir/folders.txt)
+    first2=$(head -n 1 $logDir/notDoneFolders.txt)
+    if [[ "$first1" != "$first2" ]]; then
+        head -n 1 $logDir/folders.txt > $nextPass/folders.txt
+    fi
 
-    echo "Not done folders are saved to ${logDir/$logDir/$nextPass}/folders.txt."
+    cat $logDir/notDoneFolders.txt >> $nextPass/folders.txt
+
+    
+    echo "Not done folders are saved to $nextPass/folders.txt."
 
     echo "You can run the next pass now: $nextPass"
+    echo or:
+    echo checkArchives.sh tar local/sbatch $nextPass
+
+    echo Or if there are permission issues, please run: 
+    echo sudoCorrectPermission.sh $nextPass 4
 
 fi 
 

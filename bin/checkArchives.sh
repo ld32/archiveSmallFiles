@@ -5,6 +5,7 @@ set -euo pipefail  # Ensure pipe failures propagate properly, python need this t
 function processFolder() { # sourceDir jobID
     [ -z "$rowsToTry" ] || set -x
 
+ #set -x 
     local sPath="$1"
     # sPath=${sPath/$baseDir/$snapshotDir}
     # echo working on $sPath
@@ -29,7 +30,7 @@ function processFolder() { # sourceDir jobID
     # type size name 
     # local oFiles=$(find "$sPath"  -maxdepth 1 -mindepth 1 \( -type f -o -type l -o -type d \) -printf "%y\t%s\t%f\n" | awk 'BEGIN{FS=OFS="\t"} $1=="l" || $1=="d" {$2=0}1' | sort 2> $tmpfile)
 
-    local oFiles=$(find "$sPath"  -maxdepth 1 -mindepth 1 \( -type f -o -type l -o -type d \) -printf "%y\t%s\t%f\n" | awk 'BEGIN{FS=OFS="\t"}
+    local oFiles=$(find "$sPath"  -maxdepth 1 -mindepth 1 \( -type f -o -type l -o -type d \) -printf "%y\t%s\t%f\n" 2> $tmpfile | awk 'BEGIN{FS=OFS="\t"}
 {
   # zero size for symlinks and directories
   if ($1=="l" || $1=="d") {
@@ -40,12 +41,13 @@ function processFolder() { # sourceDir jobID
     $3 = "./" $3
   }
 }
-1' | sort 2> $tmpfile)
+1' | sort )
 
-    # echo original files from $sPath:
-    # echo -e "$oFiles"
+     echo original files from $sPath:
+     echo -e "$oFiles"
 
-    [ -s $tmpfile ] && echo -e "Error: ----------`cat $tmpfile`---------------" && rm $tmpfile  && return 
+    [ -s $tmpfile ] && echo -e "Error: ----------`cat $tmpfile`---------------" && rm $tmpfile  && return
+
     rm $tmpfile
 
     #local tars=""

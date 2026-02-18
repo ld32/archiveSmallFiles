@@ -2,17 +2,13 @@
 
 #set -x
 
-dFolder="$1"
-dFolder=${dFolder%/}
-dFolder=${dFolder##*/}
-
-pass=$2
+pass=$1
 
 echo 
 echo -------------------------------------------------- 
 #echo log${dFolder}
 #dFolder=aaronsBrain--sections
-logDir=l${dFolder}.$pass 
+logDir=$pass 
 
 [ -d $logDir ] || { echo Log directory $logDir not found; exit 1; }
 

@@ -197,4 +197,18 @@ for ((i=1; i<=numLargeTarFiles && i<=numDirs; i++)); do
     tar -cf "$tarFile" -C "$tarDir" .
     rm -rf "$tarDir"
 done
+
+# Remove read permission from one folder and one file to simulate permission errors
+if [ "$numDirs" -ge 1 ]; then
+    chmod a-r "$baseDir/dir_1"
+    echo "Removed read permission from $baseDir/dir_1"
+fi
+
+# Remove read permission from a file in dir_1 if it exists
+firstFile="$baseDir/dir_1/file_1.txt"
+if [ -f "$firstFile" ]; then
+    chmod a-r "$firstFile"
+    echo "Removed read permission from $firstFile"
+fi
+
 echo "Test data generation complete. It is in $baseDir"
