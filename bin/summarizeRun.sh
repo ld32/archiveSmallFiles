@@ -1,83 +1,90 @@
 #!/bin/bash
 
-#set -x 
+#set -x
 
-[ -f ${1}Log/runTime.txt ] || { echo Runtime file not exist: ${1}Log/runTime.txt; echo Usage: $0 destinationFolder; exit; }
+dFolder="$1"
+dFolder=${dFolder%/}
+dFolder=${dFolder##*/}
 
-echo checking log: `realpath ${1}Log/runTime.txt`, file content:
-cat ${1}Log/runTime.txt
+pass=$2
 
 echo 
+echo -------------------------------------------------- 
+#echo log${dFolder}
+#dFolder=aaronsBrain--sections
+logDir=l${dFolder}.$pass 
 
-echo Run summary:
+[ -d $logDir ] || { echo Log directory $logDir not found; exit 1; }
 
-# Initialize an associative array to store start times
-declare -A start_times
-declare -A job_runtimes
+x=$(wc -l < $logDir/folders.txt)  
 
-# Initialize a variable to store the total runtime
-total_runtime=0
+rows_per_job=10000
 
-# Read the log file line by line
-while IFS= read -r line; do
-    # Split the line into an array
-    IFS=' ' read -r -a fields <<< "$line"
-    
-    # Extract the job id and the event type (start or end)
-    job_id=${fields[0]}
-    
-    [[ "$job_id" == Scan ]] && echo $line && continue 
-    
-    [[ "$job_id" == nJobs ]] && nJobs=${fields[1]} && continue
-    
-    if [[ "$job_id" =~ ^-?[0-9]+$ ]]; then 
+nJobs=$(( (x + rows_per_job - 1) / rows_per_job ))
 
-        event_type=${fields[1]}
-        
-        # Extract the time fields
-        time_string="${fields[@]:3:6}"
-        
-        # Convert the time to seconds since the epoch
-        event_time=$(date -d "$time_string" +%s)
-        
-        if [ "$event_type" == "start" ]; then
-            # Store the start time in the associative array
-            start_times[$job_id]=$event_time
-        elif [ "$event_type" == "end" ]; then
-            # Calculate the runtime and add it to the total_runtime
-            start_time=${start_times[$job_id]}
-            if [ -n "$start_time" ]; then
-                runtime=$((event_time - start_time))
-                job_runtimes[$job_id]=$runtime
-                total_runtime=$((total_runtime + runtime))
-            else 
-                echo start missing start for $job_id
-            fi
-        fi
+count=0;
+for i in `seq 1 $nJobs`; do 
+    #[ -f $logDir/slurm.$i.txt ] && log=$logDir/slurm.$i.txt || log=$logDir/slurm.$i.1.txt
+    { echo Last 10 rows of the log:; tail $logDir/slurm.*.$i.txt  2>/dev/null;  tail $logDir/slurm.*.$i.1.txt  2>/dev/null; } | grep "^$i end time" 1>/dev/null && count=$((count+1)) || { echo job $i not done; tail -n 2  $logDir/slurm.*.$i.txt; }
+done     
+#count=$nJobs
+
+if [ $count -eq $nJobs ]; then 
+    #touch $logDir/allDone
+    echo All $nJobs jobs are done already  ++++++++++++++++++   
+    passed=`cat $logDir/done.check.$pass.*.txt | wc -l | cut -d' ' -f1` 
+    total=`wc -l $logDir/folders.txt | cut -d' ' -f1`
+    if [ "$passed" -eq "$total" ]; then
+        echo All $total folders done $pass.  ++++++++++++++++++
     else 
-        continue
-    fi
-done < $1-log/runTime.txt 
+        echo $passed/$total folders done with $pass. Need rerun: $((total-passed))
+        #set -x 
+        for i in `seq 1 $nJobs`; do 
+            # passed=`wc -l $logDir/done.$pass.$i.txt 2>/dev/null | cut -d' ' -f1 || echo 0` 
+            # passed1=`wc -l $logDir/done.check.$pass.$i.txt 2>/dev/null | cut -d' ' -f1 || echo 0` 
+            # total=`wc -l $logDir/subFolder$i.txt 2>/dev/null | cut -d' ' -f1 || echo 0`
+            # [ $total -eq 0 ] && total=`wc -l $logDir/subFolder$i.check.txt 2>/dev/null | cut -d' ' -f1 || echo 0`
+           # done.$pass.$i.txt
+            if [ -f "$logDir/done.$pass.$i.txt" ]; then
+                passed=$(wc -l < "$logDir/done.$pass.$i.txt")
+            else
+                passed=0
+            fi
 
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+            # done.check.$pass.$i.txt
+            if [ -f "$logDir/done.check.$pass.$i.txt" ]; then
+                passed1=$(wc -l < "$logDir/done.check.$pass.$i.txt")
+            else
+                passed1=0
+            fi
 
-count=0
-# Print the runtime for each job in minutes
-for job_id in `seq 1 $nJobs`; do
-    runtime_seconds=${job_runtimes[$job_id]}
-    if [ ! -n "$runtime_seconds" ]; then 
-        echo -e "\n${RED}no data for job $job_id Here is the data for ${job_id}: ${NC}"
-        grep "^$job_id " $1-log/runTime.txt 
-        continue 
+            # subFolder$i.txt
+            if [ -f "$logDir/subFolder$i.txt" ]; then
+                total=$(wc -l < "$logDir/subFolder$i.txt")
+            else
+                total=0
+            fi
+
+            # fallback to subFolder$i.check.txt if total is 0
+            if [ "$total" -eq 0 ] && [ -f "$logDir/subFolder$i.check.txt" ]; then
+                total=$(wc -l < "$logDir/subFolder$i.check.txt")
+            fi
+            if [ "$passed" -gt 0 ] && [ "$passed" -ne "$total" ]; then
+                echo Job $i: $passed/$total folders done with $pass. Need rerun: $((total-passed))
+            fi 
+            if [ "$passed1" -gt 0 ] && [ "$passed1" -ne "$total" ]; then
+                echo Job $i: $passed1/$total folders done with check $pass. Need rerun: $((total-passed1))
+                #rm $logDir/slurm.check.$pass.$i.txt 2>/dev/null || true
+                #rm $logDir/done.check.$pass.$i.txt 2>/dev/null || true
+                
+            #else 
+            #    echo Job $i: All $total folders done. 
+            fi
+        done 
     fi 
-    runtime_minutes=$((runtime_seconds / 60))
-    echo "Job $job_id runtime: $runtime_minutes minutes or ($runtime_seconds seconds)"
-    count=$((count+1))
-done
+# else 
+#     echo $count of $nJobs are done. 
+#     checkJobs $dFolder; 
+    
+fi 
 
-[ $count -eq $nJobs ] && echo All jobs done
-
-# Convert total runtime to minutes and print it
-total_runtime_minutes=$((total_runtime / 60 / count))
-echo "Total runtime: $total_runtime_minutes minutes or ($((total_runtime/count)) seconds)"

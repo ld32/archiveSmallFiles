@@ -1,48 +1,39 @@
-# tar Small Files
+# Archieve Small Files
+
 To decrease number of small file, keep the folder structure, tar all files less than 1G
 
-git clone https://github.com/ld32/tarSmallFiles.git
+git clone https://github.com/ld32/archieveSmallFiles.git
 
-export PATH=$PWD/tarSmallFiles/bin:$PATH
+export PATH=$PWD/archieveSmallFiles/bin:$PATH
 
-## To tar:
+## Prepare a testing data 
+createTestData.sh 2 2 2
 
-### Single node job
-sbatch -p short -t 12:0:0 -o slurm.singleNode.log -J singleNode --mem 20G --mail-type=all -c 10 --wrap="tar.sh 10 \<sourceFolder\> \<destinationFolder\> singleNode"
+## To scan folders:
+sudoScanFolders.sh TestingData/ 1 55
 
-For example: 
+## To archive using tar:
+archiveFolders.sh tar local pass1
 
-sbatch -p short -t 12:0:0 -o slurm.singleNode.log -J singleNode --mem 20G --mail-type=all -c 10 --wrap="tar.sh 10 /n/scratch/users/l/ld32/1TRaw/small smallSingleNodeTar singleNode"
+## To check archives
+checkArchives.sh tar local pass1
 
-### Job array of 10 jobs
-sbatch -p short -t 4:0:0 -o slurm.sbatch.log -J jobArray --mem 4G --mail-type=all -c 1 --wrap="tar.sh 10 \<sourceFolder\> \<destinationFolder\> sbatch"
+## To randomly un-archieve 10 folder and compare with original
+randomCheck.sh tar pass1 10
 
-For example: 
+# Working with real data
 
-sbatch -p short -t 4:0:0 -o slurm.sbatch.log -J jobArray --mem 4G --mail-type=all -c 1 --wrap="tar.sh 10 /n/scratch/users/l/ld32/1TRaw/small smallSbatchTar sbatch"
+## To scan folders:
+sudoScanFolders.sh TestingData/ 20 55000000
 
+## To archive using tar and each job runs 10k folders:
+archiveFolders.sh tar sbatch pass1
 
-### Exclsusive 10 jobs, meaning only one job run a certain node at the same time
-sbatch -p short -t 4:0:0 -o slurm.esbatch.log -J eSbatch --mem 4G --mail-type=all -c 1 --wrap="tar.sh 10 \<sourceFolder\> \<destinationFolder\> esbatch"
+## To check archives and each job works on 10k folders
+checkArchives.sh tar sbatch pass1
 
-For example:
-
-sbatch -p short -t 4:0:0 -o slurm.esbatch.log -J eSbatch --mem 4G --mail-type=all -c 1 --wrap="tar.sh 10 /n/scratch/users/l/ld32/1TRaw/small smallExSbatchTar esbatch"
-
-## To summarize run: 
-summarizeRun.sh \<destinationFolder\>
-
-For example:
-
-summarizeRun.sh smallSingleNodeTar
-
-## To untar:
-untar.sh \<cores\> \<sourceFolder\> \<destinationFolder\>
-
-For example:
-
-untar.sh 4 /source/dir/to/data /destination/dir/to/data
-
+## To randomly un-archieve 10 folder and compare with original
+randomCheck.sh tar pass1 1000
 
 
 
