@@ -72,9 +72,6 @@ if [ -f $logDir/notDoneFolders.txt ]; then
 
     echo "You can run the next pass now: $nextPass"
     echo archiveFolders.sh tar local/sbatch $nextPass
-    echo or:
-    echo checkArchives.sh tar local/sbatch $nextPass
-
     echo Or if there are permission issues, please run: 
     echo sudoCorrectPermission.sh $nextPass 4
 fi 

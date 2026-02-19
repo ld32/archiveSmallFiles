@@ -5,10 +5,11 @@ set -e
 #set -x 
 
 usage() {
+    echo "Create some testing data to test arching/un-archiving scripts."
     echo "Usage: $0 <numDirs> <numFilesPerDir> <numSubDirs>"
-    echo "  <numDirs>        - Number of top-level directories to create."
-    echo "  <numFilesPerDir> - Number of files to create in each directory."
+    echo "  <numDirs>        - Number of top-level directories to create in adition to the special character directories."
     echo "  <numSubDirs>     - Number of subdirectories to create in each directory."
+    echo "  <numFilesPerDir> - Number of files to create in each directory."
 }
 
 if [ "$#" -ne 3 ]; then
@@ -19,8 +20,9 @@ fi
 baseDir=TestingData
 
 numDirs="$1"
-numFilesPerDir="$2"
-numSubDirs="$3"
+numSubDirs="$2"
+numFilesPerDir="$3"
+
 
 [ -d "$baseDir" ] && rm -r "$baseDir"
 mkdir -p "$baseDir"
@@ -167,7 +169,6 @@ for (( dirIndex=1; dirIndex<=numDirs; dirIndex++ )); do
 
 done
 
-# Create 3 large text files in the first 3 top-level dirs with special chars in names
 specialLargeNames=(
     "large file@#1 (test).txt"
     "large-file_#2[!].txt"
@@ -181,7 +182,6 @@ for ((i=1; i<=numLargeTextFiles && i<=numDirs; i++)); do
     echo "This is a large test text file for dir $i" | dd of="$largeTextFile" bs=1 count=1 conv=notrunc
 done
 
-# Create 2 large tar files in the first 2 top-level dirs with special chars in names
 specialLargeTarNames=(
     "large tar@#1 (test).tar"
     "large-tar_#2[!].tar"
@@ -198,17 +198,15 @@ for ((i=1; i<=numLargeTarFiles && i<=numDirs; i++)); do
     rm -rf "$tarDir"
 done
 
-# Remove read permission from one folder and one file to simulate permission errors
 if [ "$numDirs" -ge 1 ]; then
     chmod a-r "$baseDir/dir_1"
     echo "Removed read permission from $baseDir/dir_1"
 fi
 
-# Remove read permission from a file in dir_1 if it exists
-firstFile="$baseDir/dir_1/file_1.txt"
+firstFile="$baseDir/dir_2/file_1.txt"
 if [ -f "$firstFile" ]; then
     chmod a-r "$firstFile"
     echo "Removed read permission from $firstFile"
 fi
 
-echo "Test data generation complete. It is in $baseDir"
+echo "Test data generation complete. It is in $baseDir. One folder and one file are set to not readable.
