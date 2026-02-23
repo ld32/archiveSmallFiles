@@ -85,7 +85,7 @@ if [ -f "$tempFile" ]; then
     errFile="${tmpFile%.out}.err";
 
     sudo find "$2" -type d -print0 2>> "$errFile" | while IFS= read -r -d "" dir; do
-      printf "%s\n" "Processing directory: $dir";
+      printf "%s\n" "Working on directory: $dir";
       count=$(sudo find "$dir" -maxdepth 1 -type f | wc -l)
       printf "%s\t%s\n" "$count" "$dir" >> "$tmpFile"
     done
@@ -111,11 +111,7 @@ count=$(wc -l < $folders)
 
 #rows_per_job=100000
 
-nJobs=6; #$(( (count + rows_per_job - 1) / rows_per_job ))
 
-for jIndex in $(seq 1 $nJobs); do
-    awk -v jIndex="$jIndex" -v nJobs="$nJobs" '( NR - 1 ) % nJobs == jIndex - 1' "$logDir/folders.txt" > "$logDir/folders_part_$jIndex"
-done
 
 cat $tempFile.*.err >&2
 
@@ -129,4 +125,14 @@ if [[ $count -ne $folderCount ]]; then
     exit 1
 else 
     echo "Folder count matches expected value: $folderCount. Total folders found: $count."
+fi
+
+if [[ $count -gt 10000 ]]; then 
+  echo "Warning: Found $count folders, which is more than 10000. Let me split the folder list into 6 parts:"
+  nJobs=6; #$(( (count + rows_per_job - 1) / rows_per_job ))
+
+  for jIndex in $(seq 1 $nJobs); do
+    echo $logDir/folders_part_$jIndex
+    awk -v jIndex="$jIndex" -v nJobs="$nJobs" '( NR - 1 ) % nJobs == jIndex - 1' "$logDir/folders.txt" > "$logDir/folders_part_$jIndex"
+  done
 fi

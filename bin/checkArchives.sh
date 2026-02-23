@@ -42,9 +42,8 @@ function processFolder() { # sourceDir jobID
   }
 }
 1' | sort )
-
-     echo original files from $sPath:
-     echo -e "$oFiles"
+     #echo original files from $sPath:
+     #echo -e "$oFiles"
 
     [ -s $tmpfile ] && echo -e "Error: ----------`cat $tmpfile`---------------" && rm $tmpfile  && return
 

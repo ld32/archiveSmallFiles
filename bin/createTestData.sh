@@ -4,24 +4,24 @@ set -e
 #set -u
 #set -x 
 
-usage() {
-    echo "Create some testing data to test arching/un-archiving scripts."
-    echo "Usage: $0 <numDirs> <numFilesPerDir> <numSubDirs>"
-    echo "  <numDirs>        - Number of top-level directories to create in adition to the special character directories."
-    echo "  <numSubDirs>     - Number of subdirectories to create in each directory."
-    echo "  <numFilesPerDir> - Number of files to create in each directory."
-}
+# usage() {
+#     echo "Create some testing data to test arching/un-archiving scripts."
+#     echo "Usage: $0 <numDirs> <numFilesPerDir> <numSubDirs>"
+#     echo "  <numDirs>        - Number of top-level directories to create in adition to the special character directories."
+#     echo "  <numSubDirs>     - Number of subdirectories to create in each directory."
+#     echo "  <numFilesPerDir> - Number of files to create in each directory."
+# }
 
-if [ "$#" -ne 3 ]; then
-    usage
-    exit 1
-fi
+# if [ "$#" -ne 3 ]; then
+#     usage
+#     exit 1
+# fi
 
 baseDir=TestingData
 
-numDirs="$1"
-numSubDirs="$2"
-numFilesPerDir="$3"
+numDirs=2 #"$1"
+numSubDirs=2 #"$2"
+numFilesPerDir=2 #"$3"
 
 
 [ -d "$baseDir" ] && rm -r "$baseDir"
@@ -209,4 +209,4 @@ if [ -f "$firstFile" ]; then
     echo "Removed read permission from $firstFile"
 fi
 
-echo "Test data generation complete. It is in $baseDir. One folder and one file are set to not readable.
+echo "Test data generation complete. It is in $baseDir. One folder and one file are set to not readable, so that you can test the scripts."

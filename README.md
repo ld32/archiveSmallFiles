@@ -10,9 +10,9 @@ export PATH=$PWD/archiveSmallFiles/bin:$PATH
 
 ```
 # Prepare a testing data: 
-$ createTestData.sh 2 2 2
+$ createTestData.sh
 ...
-Test data generation complete. It is in /n/scratch/TestingData. One folder and one file are set to not readable.
+Test data generation complete. It is in /n/scratch/TestingData. One folder and one file are set to not readable, so that you can test the scripts.
 
 # To scan folders:
 $ sudoScanFolders.sh TestingData/ 1 55
@@ -30,10 +30,14 @@ Actual folders: 55
 Done folders: 53
 Not done folders: 2
 Not done folders are saved to pass2/folders.txt.
-You can run the next pass now: pass2
-archiveFolders.sh tar local/sbatch pass2
-Or, if there are permission issues, please run:
-sudoCorrectPermission.sh pass2 4
+Please review logs and see what is the issue: 
+$ cat pass1/tarError* 
+
+If there is permission issues, please run: 
+$ sudoCorrectPermission.sh pass2 4
+
+Aftet that, you can run the next pass now: pass2
+$ archiveFolders.sh tar local/sbatch pass2
 
 # To check archives:
 $ checkArchives.sh tar local pass
@@ -46,12 +50,16 @@ Actual folders: 55
 Done folders: 53
 Not done folders: 2
 Not done folders are saved to pass2/folders.txt.
-You can run the next pass now: pass2
-archiveFolders.sh tar local/sbatch pass2
-Or, if there are permission issues, please run:
-sudoCorrectPermission.sh pass2 4
+Please review logs and see what is the issue: 
+$ cat pass1/tarError* 
 
-# To randomly un-archieve 10 folder and compare with original:
+If there is permission issues, please run: 
+$ sudoCorrectPermission.sh pass2 4
+
+Aftet that, you can run the next pass now: pass2
+$ checkArchives.sh tar local/sbatch pass2
+
+# To randomly un-archieve 10 folder and compare with original using diff command:
 randomUnArchiveToCheck.sh tar pass1 10
 ```
 
@@ -63,6 +71,14 @@ $ sudoScanFolders.sh /n/grouns/xya/.snapshot/daily.2025.12.1/someData 20 5500000
 ...
 Folder count matches expected value: 55000000. 
 Total folders found: 55000000.
+Parallel scan is done
+Warning: Found 55 folders, which is more than 100000. Let me split the folder list into 6 parts:
+pass1/folders_part_1
+pass1/folders_part_2
+pass1/folders_part_3
+pass1/folders_part_4
+pass1/folders_part_5
+pass1/folders_part_6
 
 # To archive using tar using Slurm jobs, each job run 10k folders:
 archiveFolders.sh tar sbatch pass1
@@ -75,10 +91,14 @@ Actual folders: 5500000
 Done folders: 5499999
 Not done folders: 1
 Not done folders are saved to pass2/folders.txt.
-You can run the next pass now: pass2
-archiveFolders.sh tar local/sbatch pass2
-Or, if there are permission issues, please run:
-sudoCorrectPermission.sh pass2 4
+Please review logs and see what is the issue: 
+$ cat pass1/tarError* 
+
+If there is permission issues, please run: 
+$ sudoCorrectPermission.sh pass2 4
+
+Aftet that, you can run the next pass now: pass2
+$ checkArchives.sh tar local/sbatch pass2
 
 # To check archives:
 $ checkArchives.sh tar local pass
@@ -91,16 +111,23 @@ Actual folders: 5500000
 Done folders: 5499999
 Not done folders: 1
 Not done folders are saved to pass2/folders.txt.
-You can run the next pass now: pass2
-archiveFolders.sh tar local/sbatch pass2
-Or, if there are permission issues, please run:
-sudoCorrectPermission.sh pass2 4
+Please review logs and see what is the issue: 
+$ cat pass1/tarError* 
+
+If there is permission issues, please run: 
+$ sudoCorrectPermission.sh pass2 4
+
+Aftet that, you can run the next pass now: pass2
+$ checkArchives.sh tar local/sbatch pass2
 
 # To randomly un-archieve 10 folder and compare with original:
 randomUnarchiveToCheck.sh tar pass1 10
 
 # When we help with lab data, the tarred data need set proper ownership and permission.
-# Set ownership and permission using 4 processes: 
+# If folder list is not very large, set ownership and permission using 4 processes: 
+$ sudoSetOwnerPermision.sh pass1 4
+
+# Or if folder list is huge, run 6 interactive jobs and each job run 1 subset folders: 
 $ sudoSetOwnerPermision.sh pass1 4
 
 # Sometimes, an .snapshot may outdated. 
