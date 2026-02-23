@@ -71,6 +71,12 @@ randomUnArchiveToCheck.sh tar pass1 10
 
 ## Working with real data
 ```
+# Start an interactive job, create a working directory and go to it: 
+$ srun -p short -t 12:0:0 --mem 8G --pty /bin/bash 
+$ cd /some/big/storage/
+$ mkdir -p tarFprReal 
+$ cd tarForReal
+
 # Check Starfish website and find the actul folder count for example 5500000 folders, 
 # then scan folders using 20 processes:
 $ sudoScanFolders.sh /n/grouns/xyz/.snapshot/daily.2025.12.1/someData 20 5500000
