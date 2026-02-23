@@ -72,7 +72,7 @@ $ sudoScanFolders.sh /n/grouns/xya/.snapshot/daily.2025.12.1/someData 20 5500000
 Folder count matches expected value: 55000000. 
 Total folders found: 55000000.
 Parallel scan is done
-Warning: Found 55 folders, which is more than 100000. Let me split the folder list into 6 parts:
+Warning: Found 5500000 folders, which is more than 100000. Let me split the folder list into 6 parts:
 pass1/folders_part_1
 pass1/folders_part_2
 pass1/folders_part_3
