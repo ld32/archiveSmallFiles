@@ -9,10 +9,16 @@ export PATH=$PWD/archiveSmallFiles/bin:$PATH
 ## Practice with testing data
 
 ```
+# Start an interactive job, create a working directory and go to it: 
+$ srun -p short -t 2:0:0 --mem 2G --pty /bin/bash 
+$ cd $HOME
+$ mkdir -p tarTesting 
+$ cd tarTesting
+
 # Prepare a testing data: 
 $ createTestData.sh
 ...
-Test data generation complete. It is in /n/scratch/TestingData. One folder and one file are set to not readable, so that you can test the scripts.
+Test data generation complete. It is in /home/xyz/tarTesting/TestingData. One folder and one file are set to not readable, so that you can test the scripts.
 
 # To scan folders:
 $ sudoScanFolders.sh TestingData/ 1 55
@@ -37,7 +43,7 @@ If there is permission issues, please run:
 $ sudoCorrectPermission.sh pass2 4
 
 Aftet that, you can run the next pass now: pass2
-$ archiveFolders.sh tar local/sbatch pass2
+$ archiveFolders.sh tar local pass2
 
 # To check archives:
 $ checkArchives.sh tar local pass
@@ -57,7 +63,7 @@ If there is permission issues, please run:
 $ sudoCorrectPermission.sh pass2 4
 
 Aftet that, you can run the next pass now: pass2
-$ checkArchives.sh tar local/sbatch pass2
+$ checkArchives.sh tar local pass2
 
 # To randomly un-archieve 10 folder and compare with original using diff command:
 randomUnArchiveToCheck.sh tar pass1 10
@@ -67,7 +73,7 @@ randomUnArchiveToCheck.sh tar pass1 10
 ```
 # Check Starfish website and find the actul folder count for example 5500000 folders, 
 # then scan folders using 20 processes:
-$ sudoScanFolders.sh /n/grouns/xya/.snapshot/daily.2025.12.1/someData 20 5500000
+$ sudoScanFolders.sh /n/grouns/xyz/.snapshot/daily.2025.12.1/someData 20 5500000
 ...
 Folder count matches expected value: 55000000. 
 Total folders found: 55000000.
@@ -98,7 +104,7 @@ If there is permission issues, please run:
 $ sudoCorrectPermission.sh pass2 4
 
 Aftet that, you can run the next pass now: pass2
-$ checkArchives.sh tar local/sbatch pass2
+$ checkArchives.sh tar sbatch pass2
 
 # To check archives:
 $ checkArchives.sh tar local pass
@@ -118,7 +124,7 @@ If there is permission issues, please run:
 $ sudoCorrectPermission.sh pass2 4
 
 Aftet that, you can run the next pass now: pass2
-$ checkArchives.sh tar local/sbatch pass2
+$ checkArchives.sh tar sbatch pass2
 
 # To randomly un-archieve 10 folder and compare with original:
 randomUnarchiveToCheck.sh tar pass1 10
