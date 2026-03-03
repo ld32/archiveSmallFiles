@@ -5,7 +5,8 @@ set -euo pipefail  # Ensure pipe failures propagate properly, python need this t
 function processFolder() { # sourceDir jobID
     [ -z "$rowsToTry" ] || set -x
 
- #set -x 
+#export PS4='+${BASH_SOURCE}:${FUNCNAME[0]}:${LINENO}: '
+#set -x
     local sPath="$1"
     # sPath=${sPath/$baseDir/$snapshotDir}
     # echo working on $sPath
@@ -27,56 +28,64 @@ function processFolder() { # sourceDir jobID
 
     #[[ "$sPath" == */n/standby/* ]] && sPath="./fromStandby.${sFolder##*/}${sPath#$sFolder}"
 
-    local oFiles=$(find "$sPath"  -maxdepth 1 -mindepth 1 \( -type f -o -type l -o -type d \) -printf "%y\t%s\t%f\n" 2> $tmpfile | awk 'BEGIN{FS=OFS="\t"}
-{
-  # zero size for symlinks and directories
-  if ($1=="l" || $1=="d") {
-    $2 = 0
-  }
-  # if filename starts with "-", prepend "./"
-  if (($1=="l" || $1=="f") && ($3 ~ /^-/ || $3 == "\\")) {
-    $3 = "./" $3
-  }
-}
-1' | sort )
+    local oFiles=$(ls -lA "$sPath" 2> $tmpfile | awk '
+        /^d/ {name=""; for(i=9;i<=NF;i++) name=name (i==9?"":" ") $i; print "d\t0\t" name}
+        /^l/ {name=""; for(i=9;i<=NF;i++) name=name (i==9?"":" ") $i; print "l\t0\t" name}
+        /^-/ {name=""; for(i=9;i<=NF;i++) name=name (i==9?"":" ") $i; print "f\t" $5 "\t" name}
+        ' | sort)
+
+
+
      #echo original files from $sPath:
      #echo -e "$oFiles"
 
     [ -s $tmpfile ] && echo -e "Error: ----------`cat $tmpfile`---------------" && rm $tmpfile  && return
 
+    #rm $tmpfile
+  #  ls -lA "$path" 
+
+    ls -lA "$path" | awk '
+    /^d/ {name=""; for(i=9;i<=NF;i++) name=name (i==9?"":" ") $i; print "d\t0\t" name}
+    /^l/ {name=""; for(i=9;i<=NF;i++) name=name (i==9?"":" ") $i; print "l\t0\t" name}
+    /^-.*\.tar$/ {name=""; for(i=9;i<=NF;i++) name=name (i==9?"":" ") $i; print "TAR:" name "\t" $5}
+    /^-.*\.zarr.zip$/ {name=""; for(i=9;i<=NF;i++) name=name (i==9?"":" ") $i; print "ZARR:" name "\t" $5}
+    /^-/ && $9 !~ /\.tar$/ && $9 !~ /\.zarr.zip$/ {name=""; for(i=9;i<=NF;i++) name=name (i==9?"":" ") $i; print "f\t" $5 "\t" name}
+    ' > $tmpfile
+ 
+ #echo tmp file content:
+ #   cat $tmpfile
+
+    local non_tars=`awk '$0 !~ /^TAR:/ && $0 !~ /^ZARR:/ {print}' $tmpfile`
+    
+    local tarFiles=`grep '^TAR:' $tmpfile | cut -d: -f2- | while IFS=$'\t' read -r tarfile size; do
+   if $(tar -tf "${path}/$tarfile" | grep -qxF "${tarfile%.tar}.md5sum"); then 
+
+    
+
+  tar --wildcards --exclude='*.md5sum' -tvf "$path/$tarfile" | awk '{
+    gsub(/^-/, "f", $1)
+    name = ""
+    for (i = 6; i <= NF; i++) {
+      if ($i == "->") break
+      if (name == "") name = $i; else name = name " " $i
+    }
+    print substr($1, 1, 1) "\t" $3 "\t" name
+  }'
+
+
+  else 
+    $non_tars="$non_tars\nf\t$size\t$tarfile"   
+  fi 
+
+done`
+
+    local zarFiles=`grep '^ZARR:' $tmpfile | cut -d: -f2- | while read -r zarfile; do
+        viewZar.py "$path/$zarfile"
+    done`
+
     rm $tmpfile
 
-    #local tars=""
-    local non_tars=""
-    local tarFiles=""
-    while IFS=$'\t' read -r type size file; do
-        #if [[ "$oFiles" != *"$file"\n* ]]; then 
-            if [[ $type == d ]]; then 
-                non_tars="$non_tars$type\t0\t$file\n" # set directory size to 0 beause folder size do not match well.
-
-            # it is tar file and newly created within 7 days 
-            elif [[ $file == *.tar ]] && `tar -tf "${path}/$file" | grep -qxF "${file%.tar}.md5sum"`; then 
-
-                tarFiles="$tarFiles$(tar --wildcards --exclude='*.md5sum' -tvf "${path}/$file" |awk '{
-                    gsub(/^-/, "f", $1)
-                    name = ""
-    for (i = 6; i <= NF; i++) {
-        if ($i == "->") break
-        if (name == "") name = $i; else name = name " " $i
-    }
-                    print substr($1, 1, 1) "\t" $3 "\t" name
-                }' )\n"
-
-            elif [[ "$file" == *.zarr.zip ]]; then 
-                
-                # need to modify this to output type, name and size
-                tarFiles="$tarFiles$(viewZar.py "${path}/$file")\n"
-            
-            elif [[ $file != *.md5sum ]]; then 
-                non_tars="$non_tars$type\t$size\t$file\n"
-            fi    
-        #fi
-    done < <(find "$path" -maxdepth 1 -mindepth 1 \( -type f -o -type d \) -printf "%y\t%s\t%f\n") 
+    [ -z $zarFiles ] || tarFiles="$tarFiles\n$zarFiles"  
 
     if [ -z "$oFiles" ]; then 
         if [ -z "$tarFiles$non_tars" ]; then 
@@ -88,12 +97,10 @@ function processFolder() { # sourceDir jobID
         return; 
     fi 
 
-    #tars="${tars//\$/\\\$}"; printf "%s\n" "$tars"
-    #[ -z "$tars" ] || tarFiles=$(tar -tf ${tars} | sort) #| sed 's|^\./||')
-    
-    tarFiles=${tarFiles%\\n}; #tarFiles=`echo -e "${tarFiles}" | sort`
-    non_tars=${non_tars%\\n}
-    
+    #tarFiles="${tarFiles%\\n}";
+    tarFiles=$(echo -e "$tarFiles" | sed '${/^$/d;}') #tarFiles=`echo -e "${tarFiles}    
+    non_tars=$(echo -e "$non_tars" | sed '${/^$/d;}')
+
     if [ -z "$tarFiles" ]; then 
         tarFiles=`echo -e "$non_tars" | sort`
     elif [ -z "$non_tars" ]; then 
@@ -106,8 +113,8 @@ function processFolder() { # sourceDir jobID
     #echo -e "$tarFiles" | sort
 
     if [ -n "$tarFiles$non_tars$oFiles" ] && [ -n "$(diff <(echo -e "$oFiles") <(echo -e "$tarFiles"))" ]; then
-        echo checking file $sPath vs $path
-        ls $path/*.tar 2>/dev/null && echo Error: wrong tar to delete: "$path"/*.tar "$path"/*.md5sum 
+        echo Checking $sPath vs $path
+        echo $path/*.tar 2>/dev/null && echo Error: wrong tar to delete: "$path"/*.tar
         
         [ -n "$oFiles" ] &&  echo -e "orignal files:\n$oFiles"
 
@@ -296,7 +303,7 @@ elif [[ $runType == sbatch ]]; then
 
     x=$(wc -l < $logDir/folders.txt)  
 
-    export rows_per_job=1000
+    export rows_per_job=10000
 
     nJobs=$(( (x + rows_per_job - 1) / rows_per_job ))
 

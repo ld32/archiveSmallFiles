@@ -40,9 +40,16 @@ folders="$logDir/folders.txt"
 
 export tmpDir="$logDir/tmp"
 
+tmpfile=$(mktemp)
+
 mkdir -p "$tmpDir"
 
+set -x 
+
 echo > $logDir/randomCheck.log
+
+x=$(wc -l < "$folders")
+[ "$x" -lt "$count" ] && { echo "Warning: number of paths in $folders is less than $count. Will check all $x paths."; count="$x"; }
 
 mapfile -t selected_paths < <(shuf -n $count "$folders")
 
@@ -101,7 +108,11 @@ printf "%s\n" "Processing: $sourceDir vs $destDir"
             #ls $tmpDir
         fi 
 
-        find "$sourceDir" -maxdepth 1 -mindepth 1 \( -type f -o -type l \) -printf "%f\t%s\n" | sort -n > $logDir/sourceDir.txt
+        find "$sourceDir" -maxdepth 1 -mindepth 1 \( -type f -o -type l \) -printf "%f\t%s\n" 2> $tmpfile | sort -n > $logDir/sourceDir.txt
+
+        [ -s $tmpfile ] && { cat $tmpfile; rm $tmpfile; continue; }
+        rm -fr $tmpDir/* $tmpfile 2>/dev/null
+
         find "$tmpDir" -maxdepth 1 -mindepth 1 \( -type f -o -type l \) -printf "%f\t%s\n" | sort -n > $logDir/tmpDir.txt
       
         # echo Source Directory: $sourceDir

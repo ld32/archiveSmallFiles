@@ -32,7 +32,7 @@ else
 fi
 
 if [ -s $logDir/notDoneFolders.txt ]; then 
-    echo "There are folders infolders.txt that are not in done.all.txt"
+    echo "There are folders in folders.txt that are not in done.all.txt"
     echo "Check $logDir/notDoneFolders.txt for details"
 else
     rm $logDir/notDoneFolders.txt
@@ -76,7 +76,7 @@ if [ -f $logDir/notDoneFolders.txt ]; then
     echo 
 
     echo "If there is permission issues, please run:" 
-    echo "\$ sudoCorrectPermission.sh pass2 4"
+    echo "\$ sudoCorrectPermission.sh $nextPass 4"
     echo 
     echo "Aftet that, you can run the next pass: $nextPass"
     echo "\$ archiveFolders.sh tar local/sbatch $nextPass"

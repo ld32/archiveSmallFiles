@@ -3,7 +3,7 @@
 set -uo pipefail  # Ensure pipe failures propagate properly, python need this to work.
 
 set -e
-#set -x
+set -x
 
 echo Running $0 $@ 
 
@@ -56,22 +56,32 @@ tempFile=$(mktemp $logDir/tmpfile.XXXXXX)
 
 #trap "pkill -f 'sleep'; pkill -f 'sudo -v'; rm -r $dFolderTmp $tempFile $tempFile.txt  $tempFile.*.err $tempFile.*.txt 2>/dev/null;" EXIT
 
-for i in {1..10}; do 
-    #set -x 
-    echo "Working on ${i}th level..."
-    [ -f "$tempFile" ] && rm "$tempFile"  
-    sudo find "$sDir" -mindepth $i -maxdepth $i -type d 2>> $tempFile.0.err | while read -r dir; do  
-      printf "%s\n" "Working on $dir"
-      count=$(sudo find "$dir" -maxdepth 1 -type f | wc -l)
-      printf "%s\t%s\n" "$count" "$dir" >> "$tempFile"
-    done
-    [ -f $tempFile ] && x=$(wc -l < "$tempFile")  || x=0 
-    
-    [ "$x" -lt $limit ] || break
+#sudo ls -l "$sDir" 2>/dev/null | grep "^d" | awk -v dir="$sDir" '{print 0 "\t" dir "/" $9}' > $tempFile
 
-    [ -f "$tempFile" ] &&  cat "$tempFile" >> $tempFile.0.txt
-    #sleep 2
-done 
+sudo ls -l "$sDir" 2>/dev/null | grep "^d" | awk -v dir="$sDir" '{for(i=9;i<=NF;i++) printf "%s%s", (i==9?"":OFS), $i; print ""}' | awk -v dir="$sDir" '{print 0 "\t" dir "/" $0}' > $tempFile
+                
+#sudo ls -l "$sDir" 2>/dev/null | grep "^d" | awk '{print 0 "\t" $sDir/$9}' > $tempFile
+count=$(wc -l < "$tempFile")
+if [ "$count" -le $limit ]; then 
+#    cat "$tempFile" >> $tempFile.0.txt
+#else
+    for i in {1..10}; do 
+        #set -x 
+        echo "Working on ${i}th level..."
+        [ -f "$tempFile" ] && rm "$tempFile"  
+        sudo find "$sDir" -mindepth $i -maxdepth $i -type d 2>> $tempFile.0.err | while read -r dir; do  
+          printf "%s\n" "Working on $dir"
+          count=$(sudo ls -lA "$dir" 2>/dev/null | awk '!/^d/ && !/^total/ {print $9}' | wc -l)
+          printf "%s\t%s\n" "$count" "$dir" >> "$tempFile"
+        done
+        [ -f $tempFile ] && x=$(wc -l < "$tempFile")  || x=0 
+        
+        [ "$x" -lt $limit ] || break
+
+        [ -f "$tempFile" ] &&  cat "$tempFile" >> $tempFile.0.txt
+        #sleep 2
+    done 
+fi 
 
 #cat "$tempFile.0.txt"
 

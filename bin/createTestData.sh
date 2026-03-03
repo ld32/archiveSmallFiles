@@ -37,7 +37,7 @@ fileExtensions=("txt" "dat" "log")
 # Create directories with special characters in their names
 specialDirs=(
     "dir-with-hyphen"
-    "dir.with.dot"
+    ".dir.with.dot"
     "dir,with,comma"
     "dir(with(paren)"
     "dir)with)paren)"
@@ -84,6 +84,7 @@ for (( dirIndex=1; dirIndex<=numDirs; dirIndex++ )); do
             echo "This is test content for file $fileIndex with extension .${ext} in directory $dirIndex" > "$filePath"
             echo "Created file: $filePath"
         done
+        cp "$dirPath/file_${fileIndex}.${ext}" "$dirPath/.file_${fileIndex}.${ext}" 
     done
 
     # Create special character directories for each dirIndex

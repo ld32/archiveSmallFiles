@@ -36,9 +36,13 @@ echo Running $0 $@
 
 set -x 
 
+[ "$#" -ne 2 ] && usage 
+
 sFolder=`head -n 1 $1/folders.txt`
 
 export pass="$1"
+
+export nJobs="$2"
 
 export sFolder=${sFolder%/}
 
@@ -57,7 +61,7 @@ fi
 
 echo star time $(date)
 
-cat $logDir/folders.txt | xargs -P 32 -I "{}" bash -c '
+cat $logDir/folders.txt | xargs -P "$nJobs" -I "{}" bash -c '
     #source $1;
     processFolder "$1" 0
 ' __ "{}"

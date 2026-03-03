@@ -18,7 +18,8 @@ $ cd tarTesting
 # Prepare a testing data: 
 $ createTestData.sh
 ...
-Test data generation complete. It is in /home/xyz/tarTesting/TestingData. One folder and one file are set to not readable, so that you can test the scripts.
+Test data generation complete. It is in /home/xyz/tarTesting/TestingData. 
+One folder and one file are set to not readable, so that you can test the scripts.
 
 # To scan folders:
 $ sudoScanFolders.sh TestingData/ 1 55
@@ -71,20 +72,23 @@ randomUnArchiveToCheck.sh tar pass1 10
 
 ## Working with real data
 ```
-# Start an interactive job, create a working directory and go to it: 
+# Start an interactive job, create a working directory where you 
+# want to keep the archived data and go to it: 
 $ srun -p short -t 12:0:0 --mem 8G --pty /bin/bash 
 $ cd /some/big/storage/
 $ mkdir -p tarFprReal 
 $ cd tarForReal
 
-# Check Starfish website and find the actul folder count for example 5500000 folders, 
+# Check Starfish website and find the actul folder count, 
+# for example 5500000 folders, 
 # then scan folders using 20 processes:
-$ sudoScanFolders.sh /n/grouns/xyz/.snapshot/daily.2025.12.1/someData 20 5500000
+$ sudoScanFolders.sh /n/data1/xyz/.snapshot/daily.2026.2.1/someData 20 5500000
 ...
 Folder count matches expected value: 55000000. 
 Total folders found: 55000000.
 Parallel scan is done
-Warning: Found 5500000 folders, which is more than 100000. Let me split the folder list into 6 parts:
+Warning: Found 5500000 folders, which is more than 100000. 
+Let me split the folder list into 6 parts:
 pass1/folders_part_1
 pass1/folders_part_2
 pass1/folders_part_3
@@ -135,15 +139,34 @@ $ checkArchives.sh tar sbatch pass2
 # To randomly un-archieve 10 folder and compare with original:
 randomUnarchiveToCheck.sh tar pass1 10
 
-# When we help with lab data, the tarred data need set proper ownership and permission.
-# If folder list is not very large, set ownership and permission using 4 processes: 
+# When we help with lab data, the tarred data 
+# need set proper ownership and permission.
+# If folder list is not very large, 
+# set ownership and permission using 4 processes: 
 $ sudoSetOwnerPermision.sh pass1 4
 
-# Or if folder list is huge, run 6 interactive jobs and each job run 1 subset folders: 
-$ sudoSetOwnerPermision.sh pass1 4
+# Or if folder list is huge, run 6 interactive 
+# jobs and each job run 1 subset folders: 
+# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
+$ sudoSetOwnerPermisionParts.sh pass1 4 1
+
+# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
+$ sudoSetOwnerPermision.sh pass1 4 2
+
+# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
+$ sudoSetOwnerPermision.sh pass1 4 3
+
+# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
+$ sudoSetOwnerPermision.sh pass1 4 4
+
+# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
+$ sudoSetOwnerPermision.sh pass1 4 5
+
+# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
+$ sudoSetOwnerPermision.sh pass1 4 6
 
 # Sometimes, an .snapshot may outdated. 
-# To updata .snapshot version: 
+# To updata .snapshot version with the folder paths: 
 $ updateSnapshotVersion.sh
 
 ```

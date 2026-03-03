@@ -114,7 +114,7 @@ function processFolder() { # $1 input path $2 job ID
 
     #echo -e "$find_output"
 
-    cat "$error_log" >> $logDir/tarError$2.txt
+    [ -s "$error_log" ] && cat "$error_log" >> $logDir/tarError$2.txt
     
     if grep -q "Permission denied" "$error_log" 2>/dev/null; then
         echo "Find command encountered permission error: $sourceDir Exiting."
@@ -246,7 +246,7 @@ usage() {
     echo "Usage: $0 <action: tar/zar> <runType: local/sbatch> <pass: pass#> <fromJob> <toJob> <rowsToTry>"; exit 1;
 }
 
-set -x
+#set -x
 
 date
 
@@ -271,7 +271,7 @@ logDir=$3
 
 sFolder=`head -n 1 $logDir/folders.txt`
 
-folders=$logDir/folders.txt
+export folders=$logDir/folders.txt
 
 [[ -z "$sFolder" ]] && { echo "Error: source folder not specified"; usage; } 
 
@@ -420,7 +420,7 @@ elif [[ $runType == sbatch ]]; then
     echo "echo Job index: \$jIndex" >> $logDir/job.sh
     echo "echo \$jIndex start time \$(date) \$SLURM_JOBID" >> $logDir/job.sh
 
-    echo rm $logDir/subFolder\$1.txt 2>/dev/null >> $logDir/job.sh
+    echo "rm $logDir/subFolder\$1.txt 2>/dev/null" >> $logDir/job.sh
 
     if [ -z "$rowsToTry" ]; then  
         echo "awk -v jIndex=\"\$jIndex\" -v nJobs=\"\$nJobs\" '( NR - 1 ) % nJobs == jIndex - 1' \"\$folders\" | xargs -P 1 -I {} bash -c '" >> $logDir/job.sh
