@@ -70,6 +70,9 @@ $ checkArchives.sh tar local pass2
 randomUnArchiveToCheck.sh tar pass1 10
 ```
 
+## Un-Archive 
+$ unArchives.sh tar local pass2 # todo: need more work
+
 ## Working with real data
 ```
 # Start an interactive job, create a working directory where you 
