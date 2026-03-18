@@ -71,6 +71,11 @@ randomUnArchiveToCheck.sh tar pass1 10
 ```
 
 ## Un-Archive 
+``` bash 
+# quickly untar from interactive commandline: 
+$ find dataFolder -name "*.tar" -print0 | xargs -0 -P 4 -I {} sh -c 'tar --overwrite -xf "$1" -C "$(dirname "$1")"; rm $1 ${1/.tar/.md5sum}' _ {}
+
+# Using scripts
 $ unArchives.sh tar local pass2 # todo: need more work
 
 ## Working with real data
