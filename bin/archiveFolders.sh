@@ -383,7 +383,7 @@ elif [[ $runType == sbatch ]]; then
 
     x=$(wc -l < $folders)  
     
-    export rows_per_job=10000
+    export rows_per_job=200
 
     nJobs=$(( (x + rows_per_job - 1) / rows_per_job ))
 
