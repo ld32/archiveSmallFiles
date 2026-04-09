@@ -391,14 +391,14 @@ elif [[ $runType == sbatch ]]; then
     export rows_per_job=200
 
     if [ "$x" -gt $(( 150 * 200 )) ]; then
-        rows_per_job=$(( (x + 150 - 1) / 150 ))
+        export rows_per_job=$(( (x + 150 - 1) / 150 ))
     fi
 
     nJobs=$(( (x + rows_per_job - 1) / rows_per_job ))
 
     if [ "$x" -lt 200 ] && [ "$x" -gt 0 ]; then
-        rows_per_job=$x
-        nJobs=1
+        export rows_per_job=$x
+        export nJobs=1
     fi
 
 
