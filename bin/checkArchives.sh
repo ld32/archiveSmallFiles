@@ -294,12 +294,27 @@ elif [[ $runType == sbatch ]]; then
         mem=4G
     fi 
 
-    x=$(wc -l < $logDir/folders.txt)  
+    #x=$(wc -l < $logDir/folders.txt)  
 
-    export rows_per_job=1000
+    #export rows_per_job=1000
+
+    #nJobs=$(( (x + rows_per_job - 1) / rows_per_job ))
+
+        x=$(wc -l < "$folders")
+
+    export rows_per_job=200
+
+    if [ "$x" -gt $(( 150 * 200 )) ]; then
+        rows_per_job=$(( (x + 150 - 1) / 150 ))
+    fi
 
     nJobs=$(( (x + rows_per_job - 1) / rows_per_job ))
 
+    if [ "$x" -lt 200 ] && [ "$x" -gt 0 ]; then
+        rows_per_job=$x
+        nJobs=1
+    fi
+    
     #[ $x -lt $nJobs ] && nJobs=$x
     echo nJobs $nJobs >> $logDir/runTime.txt
 
