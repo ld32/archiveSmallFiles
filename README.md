@@ -88,6 +88,7 @@ $ find dataFolder -name "*.tar" -print0 | xargs -0 -P 4 -I {} sh -c 'tar --overw
 
 # Using scripts
 $ unArchives.sh tar local pass2 # todo: need more work
+```
 
 ## Working with real data
 ```
