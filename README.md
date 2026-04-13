@@ -134,7 +134,7 @@ If there is permission issues, please run:
 $ sudoCorrectPermission.sh pass2 4
 
 Aftet that, you can run the next pass now: pass2
-$ checkArchives.sh tar sbatch pass2
+$ archiveFolders.sh tar sbatch pass2
 
 # To check archives:
 $ checkArchives.sh tar local pass
