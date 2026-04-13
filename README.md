@@ -91,7 +91,7 @@ $ unArchives.sh tar local pass2 # todo: need more work
 ```
 
 ## Working with real data
-```
+``` bash
 # Start an interactive job, create a working directory where you 
 # want to keep the archived data and go to it: 
 $ srun -p short -t 12:0:0 --mem 8G --pty /bin/bash 
