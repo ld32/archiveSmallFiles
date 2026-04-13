@@ -109,12 +109,11 @@ printf "%s\n" "Processing: $sourceDir vs $destDir"
         fi 
 
         find "$sourceDir" -maxdepth 1 -mindepth 1 \( -type f -o -type l \) -printf "%f\t%s\n" 2> $tmpfile | sort -n > $logDir/sourceDir.txt
+	find "$tmpDir" -maxdepth 1 -mindepth 1 \( -type f -o -type l \) -printf "%f\t%s\n" | sort -n > $logDir/tmpDir.txt
 
         [ -s $tmpfile ] && { cat $tmpfile; rm $tmpfile; continue; }
         rm -fr $tmpDir/* $tmpfile 2>/dev/null
 
-        find "$tmpDir" -maxdepth 1 -mindepth 1 \( -type f -o -type l \) -printf "%f\t%s\n" | sort -n > $logDir/tmpDir.txt
-      
         # echo Source Directory: $sourceDir
         # cat sourceDir.txt
 
