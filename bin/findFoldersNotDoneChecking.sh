@@ -20,12 +20,6 @@ sFolder=`head -n 1 $logDir/folders.txt`
 
 cat $logDir/done.check.$logDir.*.txt | sort | uniq > $logDir/done.all.txt 
 
-cat $logDir/done.check.$logDir.*.withCount | sort | uniq > $logDir/done.all.withCount
-
-echo Total number of files: 
-awk '{sum += $1} END {print sum}' $logDir/done.all.withCount
-awk '{sum += $2} END {print sum}' $logDir/done.all.withCount
-
 grep -Fxv -f $logDir/done.all.txt $logDir/folders.txt > $logDir/notDoneFolders.txt 
 
 grep -Fxv -f $logDir/folders.txt $logDir/done.all.txt  > $logDir/extraDoneFolders.txt
@@ -85,5 +79,11 @@ if [ -f $logDir/notDoneFolders.txt ]; then
     echo "\$ checkArchives.sh tar local/sbatch $nextPass"
 
 fi 
+
+cat $logDir/done.check.$logDir.*.withCount | sort | uniq > $logDir/done.all.withCount
+
+echo Total number of files: 
+awk '{sum += $1} END {print sum}' $logDir/done.all.withCount
+awk '{sum += $2} END {print sum}' $logDir/done.all.withCount
 
 
