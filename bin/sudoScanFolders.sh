@@ -99,6 +99,9 @@ echo "Parallel scan is done"
 
 cat  $tempFile.*.txt > $folders.withCount
 
+echo Total number of files: 
+awk '{sum += $1} END {print sum}' $folders.withCount
+
 sort -nr $folders.withCount > $folders.withCount.sorted
 
 echo "$sDir" > $folders 
