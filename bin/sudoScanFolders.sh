@@ -62,7 +62,7 @@ for i in {1..10}; do
     [ -f "$tempFile" ] && rm "$tempFile"  
     sudo find "$sDir" -mindepth $i -maxdepth $i -type d 2>> $tempFile.0.err | while read -r dir; do  
       printf "%s\n" "Working on $dir"
-      count=$(sudo find "$dir" -maxdepth 1 -type f | wc -l)
+      count=$(sudo find "$dir" -maxdepth 1 -type f -o -type l | wc -l)
       printf "%s\t%s\n" "$count" "$dir" >> "$tempFile"
     done
     [ -f $tempFile ] && x=$(wc -l < "$tempFile")  || x=0 
@@ -86,7 +86,7 @@ if [ -f "$tempFile" ]; then
 
     sudo find "$2" -type d -print0 2>> "$errFile" | while IFS= read -r -d "" dir; do
       printf "%s\n" "Working on directory: $dir";
-      count=$(sudo find "$dir" -maxdepth 1 -type f | wc -l)
+      count=$(sudo find "$dir" -maxdepth 1 -type f -o -type l | wc -l)
       printf "%s\t%s\n" "$count" "$dir" >> "$tmpFile"
     done
   ' _ "$dFolderTmp" "{}"
@@ -134,3 +134,5 @@ if [[ $count -gt 10000 ]]; then
     awk -v jIndex="$jIndex" -v nJobs="$nJobs" '( NR - 1 ) % nJobs == jIndex - 1' "$logDir/folders.txt" > "$logDir/folders_part_$jIndex"
   done
 fi
+echo "Total number of files (should be the same as the number of files in starfish):"
+awk '{sum += $1} END {print sum}' $folders.withCount

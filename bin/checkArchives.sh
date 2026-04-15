@@ -49,6 +49,8 @@ function processFolder() { # sourceDir jobID
     #local tars=""
     local non_tars=""
     local tarFiles=""
+    local count=0
+    local countN=0
     while IFS=$'\t' read -r type size file; do
         #if [[ "$oFiles" != *"$file"\n* ]]; then 
             if [[ $type == d ]]; then 
@@ -56,7 +58,7 @@ function processFolder() { # sourceDir jobID
 
             # it is tar file and newly created within 7 days 
             elif [[ $file == *.tar ]] && `tar -tf "${path}/$file" | grep -qxF "${file%.tar}.md5sum"`; then 
-
+                countN=$((countN + 1))  
                 tarFiles="$tarFiles$(tar --wildcards --exclude='*.md5sum' -tvf "${path}/$file" |awk '{
                     gsub(/^-/, "f", $1)
                     name = ""
@@ -66,13 +68,16 @@ function processFolder() { # sourceDir jobID
     }
                     print substr($1, 1, 1) "\t" $3 "\t" name
                 }' )\n"
+                count=$((`echo -n "$tarFiles" | wc -l` + count + 1)) 
 
             elif [[ "$file" == *.zarr.zip ]]; then 
-                
+                countN=$((countN + 1))
                 # need to modify this to output type, name and size
                 tarFiles="$tarFiles$(viewZar.py "${path}/$file")\n"
             
             elif [[ $file != *.md5sum ]]; then 
+                count=$((count + 1))
+                countN=$((countN +1))
                 non_tars="$non_tars$type\t$size\t$file\n"
             fi    
         #fi
@@ -123,6 +128,7 @@ function processFolder() { # sourceDir jobID
         #printf '%b\n' "$sPath" >> $logDir/reRun.check.$pass.txt
     else
         printf '%b\n' "$1" >> $logDir/done.check.$pass.$2.txt
+        echo $count $countN $1 >> $logDir/done.check.$pass.$2.withCount
     fi
 
     #set +x 
