@@ -197,6 +197,7 @@ for ((i=1; i<=numLargeTarFiles && i<=numDirs; i++)); do
     echo "Creating large tar file: $tarFile"
     tar -cf "$tarFile" -C "$tarDir" .
     rm -rf "$tarDir"
+    
 done
 
 if [ "$numDirs" -ge 1 ]; then
@@ -208,6 +209,7 @@ firstFile="$baseDir/dir_2/file_1.txt"
 if [ -f "$firstFile" ]; then
     chmod a-r "$firstFile"
     echo "Removed read permission from $firstFile"
+    ln -s "$firstFile" "$baseDir/dir_2/link"	
 fi
 
 echo "Test data generation complete. It is in $baseDir. One folder and one file are set to not readable, so that you can test the scripts."

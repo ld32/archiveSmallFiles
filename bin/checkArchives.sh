@@ -68,7 +68,7 @@ function processFolder() { # sourceDir jobID
     }
                     print substr($1, 1, 1) "\t" $3 "\t" name
                 }' )\n"
-                count=$((`echo -n "$tarFiles" | wc -l` + count)) 
+                count=$((`echo -n "$tarFiles" | wc -l` + count + 1)) 
 
             elif [[ "$file" == *.zarr.zip ]]; then 
                 countN=$((countN + 1))

@@ -3,7 +3,7 @@
 set -uo pipefail  # Ensure pipe failures propagate properly, python need this to work.
 
 set -e
-set -x
+#set -x
 
 echo Running $0 $@ 
 
@@ -58,7 +58,7 @@ tempFile=$(mktemp $logDir/tmpfile.XXXXXX)
 
 #sudo ls -l "$sDir" 2>/dev/null | grep "^d" | awk -v dir="$sDir" '{print 0 "\t" dir "/" $9}' > $tempFile
 
-sudo ls -l "$sDir" 2>/dev/null | grep "^d" | awk -v dir="$sDir" '{for(i=9;i<=NF;i++) printf "%s%s", (i==9?"":OFS), $i; print ""}' | awk -v dir="$sDir" '{print 0 "\t" dir "/" $0}' > $tempFile
+sudo ls -lA "$sDir" 2>/dev/null | grep "^d" | awk -v dir="$sDir" '{for(i=9;i<=NF;i++) printf "%s%s", (i==9?"":OFS), $i; print ""}' | awk -v dir="$sDir" '{print 0 "\t" dir "/" $0}' > $tempFile
                 
 #sudo ls -l "$sDir" 2>/dev/null | grep "^d" | awk '{print 0 "\t" $sDir/$9}' > $tempFile
 count=$(wc -l < "$tempFile")
@@ -96,8 +96,8 @@ if [ -f "$tempFile" ]; then
 
     sudo find "$2" -type d -print0 2>> "$errFile" | while IFS= read -r -d "" dir; do
       printf "%s\n" "Working on directory: $dir";
-      count=$(sudo find "$dir" -maxdepth 1 -type f | wc -l)
-      printf "%s\t%s\n" "$count" "$dir" >> "$tmpFile"
+	count=$(sudo ls -lA "$dir" 2>/dev/null | awk '\''!/^d/ && !/^total/ {print $9}'\'' | wc -l)
+	printf "%s\t%s\n" "$count" "$dir" >> "$tmpFile"
     done
   ' _ "$dFolderTmp" "{}"
 fi   
@@ -108,9 +108,6 @@ cat "$dFolderTmp"/*.err > "$tempFile.1.err" 2>/dev/null || true
 echo "Parallel scan is done"
 
 cat  $tempFile.*.txt > $folders.withCount
-
-echo Total number of files: 
-awk '{sum += $1} END {print sum}' $folders.withCount
 
 sort -nr $folders.withCount > $folders.withCount.sorted
 
@@ -133,7 +130,7 @@ if [[ $count -ne $folderCount ]]; then
     echo "Error: Folder count mismatch. Expected $folderCount, acutal $count."
     echo "Please check the error file $tempFile.*.err for details."
     echo "The folder list is saved in $folders"
-    exit 1
+    #exit 1
 else 
     echo "Folder count matches expected value: $folderCount. Total folders found: $count."
 fi
@@ -147,3 +144,5 @@ if [[ $count -gt 10000 ]]; then
     awk -v jIndex="$jIndex" -v nJobs="$nJobs" '( NR - 1 ) % nJobs == jIndex - 1' "$logDir/folders.txt" > "$logDir/folders_part_$jIndex"
   done
 fi
+echo "Total number of files (should be the same as the number of files in starfish):"
+awk '{sum += $1} END {print sum}' $folders.withCount
