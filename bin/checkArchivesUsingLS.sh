@@ -56,28 +56,32 @@ function processFolder() { # sourceDir jobID
  #   cat $tmpfile
 
     local non_tars=`awk '$0 !~ /^TAR:/ && $0 !~ /^ZARR:/ {print}' $tmpfile`
+    local count=$(echo -e "$no_tars" | wc -l)
+    local countN=$(grep -v "^d" $tmpfile | wc -l)
     
     local tarFiles=`grep '^TAR:' $tmpfile | cut -d: -f2- | while IFS=$'\t' read -r tarfile size; do
-   if $(tar -tf "${path}/$tarfile" | grep -qxF "${tarfile%.tar}.md5sum"); then 
+        if $(tar -tf "${path}/$tarfile" | grep -qxF "${tarfile%.tar}.md5sum"); then 
 
-    
+   
 
-  tar --wildcards --exclude='*.md5sum' -tvf "$path/$tarfile" | awk '{
-    gsub(/^-/, "f", $1)
-    name = ""
-    for (i = 6; i <= NF; i++) {
-      if ($i == "->") break
-      if (name == "") name = $i; else name = name " " $i
-    }
-    print substr($1, 1, 1) "\t" $3 "\t" name
-  }'
+            tar --wildcards --exclude='*.md5sum' -tvf "$path/$tarfile" | awk '{
+                gsub(/^-/, "f", $1)
+                name = ""
+                for (i = 6; i <= NF; i++) {
+                    if ($i == "->") break
+                    if (name == "") name = $i; else name = name " " $i
+                }
+                print substr($1, 1, 1) "\t" $3 "\t" name
+            }'
+  
 
+        else 
+            count=$((count + 1))
+            $non_tars="$non_tars\nf\t$size\t$tarfile"   
+        fi 
 
-  else 
-    $non_tars="$non_tars\nf\t$size\t$tarfile"   
-  fi 
-
-done`
+    done`
+    count=$((`echo -e "$tarFiles" | wc -l` + count))
 
     local zarFiles=`grep '^ZARR:' $tmpfile | cut -d: -f2- | while read -r zarfile; do
         viewZar.py "$path/$zarfile"
@@ -91,6 +95,7 @@ done`
         if [ -z "$tarFiles$non_tars" ]; then 
             echo -e "empty folder, nothing to check: $sPath"
             printf '%b\n' "$1" >> $logDir/done.check.$pass.$2.txt 
+            echo $count $countN $1 >> $logDir/done.check.$pass.$2.withCount
         else 
             echo "Error: original files do not exist, but there are extra files in destination!!!"
         fi 
@@ -130,6 +135,7 @@ done`
         #printf '%b\n' "$sPath" >> $logDir/reRun.check.$pass.txt
     else
         printf '%b\n' "$1" >> $logDir/done.check.$pass.$2.txt
+        echo $count $countN $1 >> $logDir/done.check.$pass.$2.withCount
     fi
 
     #set +x 
