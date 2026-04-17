@@ -145,8 +145,11 @@ if [[ $count -gt 10000 ]]; then
     awk -v jIndex="$jIndex" -v nJobs="$nJobs" '( NR - 1 ) % nJobs == jIndex - 1' "$logDir/folders.txt" > "$logDir/folders_part_$jIndex"
   done
 fi
+
+
+echo -e "Scan results (should match with the numbers in starfish):\nTotal number of folders:\n$count\nAnd total number of files:"  | tee -a $logDir/summary
+
 count=$(sudo find "$sDir" -maxdepth 1 -type f -o -type l | wc -l)
 printf "%s\t%s\n" "$count" "$sDir" >> $folders.withCount
 
-echo -e "Scan results (should match with the numbers in starfish):\nTotal number of folders:\n$folderCount\nAnd total number of files:"  | tee -a $logDir/summary
 awk '{sum += $1} END {print sum}' $folders.withCount  | tee -a $logDir/summary
