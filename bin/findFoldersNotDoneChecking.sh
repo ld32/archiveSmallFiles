@@ -38,11 +38,14 @@ else
     rm $logDir/notDoneFolders.txt
 fi
 
+echo $logDir | tee -a summary 
+
 echo "Archive checking results:" | tee -a summary
 
-echo "Actual folders: $(wc -l < $logDir/folders.txt)"
+echo "Actual folders: $(wc -l < $logDir/folders.txt)" | tee -a summary
 
-echo "Done folders: $(wc -l < $logDir/done.all.txt)"
+echo "Done folders: $(wc -l < $logDir/done.all.txt)" | tee -a summary
+
 [ -f $logDir/extraDoneFolders.txt ] && echo "Extra done folders: $(wc -l < $logDir/extraDoneFolders.txt)"
 
 
