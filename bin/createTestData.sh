@@ -219,5 +219,6 @@ for i in {1..5}; do
 done
 
 touch $baseDir/folder/emptyFile
+touch $baseDir/folder/emptyFile1
 
 echo "Test data generation complete. It is in $baseDir. One folder and one file are set to not readable, so that you can test the scripts."
