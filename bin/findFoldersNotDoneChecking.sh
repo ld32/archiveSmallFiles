@@ -82,10 +82,11 @@ fi
 
 cat $logDir/done.check.$logDir.*.withCount | sort | uniq > $logDir/done.all.withCount
 
-echo "Total number of files if we  untar all the data (should be the same as untarred file count):" 
-awk '{sum += $1} END {print sum}' $logDir/done.all.withCount
+echo "Archive checking results:" | tee -a summary
+echo "Total number of files if we  untar all the data (should be the same as untarred file count):" | tee -a summary 
+awk '{sum += $1} END {print sum}' $logDir/done.all.withCount | tee -a summary 
 
-echo "Total number of files after tarring (should be the same the number of files in tarred folder in starfish):"
-awk '{sum += $2} END {print sum}' $logDir/done.all.withCount
+echo "Total number of files after tarring (should be the same the number of files in tarred folder in starfish):" | tee -a summary 
+awk '{sum += $2} END {print sum}' $logDir/done.all.withCount | tee -a summary 
 
 
