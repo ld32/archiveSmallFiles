@@ -147,9 +147,9 @@ if [[ $count -gt 10000 ]]; then
 fi
 
 
-echo -e "Scan results (should match with the numbers in starfish):\nTotal number of folders:\n$count\nAnd total number of files:"  | tee -a $logDir/summary
+echo -e "Scan results (should match with the numbers in starfish):\nTotal number of folders:\n$count\nAnd total number of files:"  | tee -a summary
 
 count=$(sudo find "$sDir" -maxdepth 1 -type f -o -type l | wc -l)
 printf "%s\t%s\n" "$count" "$sDir" >> $folders.withCount
 
-awk '{sum += $1} END {print sum}' $folders.withCount  | tee -a $logDir/summary
+awk '{sum += $1} END {print sum}' $folders.withCount  | tee -a summary
