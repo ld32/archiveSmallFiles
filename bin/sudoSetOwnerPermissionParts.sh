@@ -61,7 +61,8 @@ fi
 
 echo star time $(date)
 
-cat $logDir/$folderFile | xargs -P $nJobs -I "{}" bash -c '
+cat $logDir/$folderFile | tr '\n' '\0' | \
+xargs -0 -P $nJobs -I "{}" bash -c '
     #source $1;
     processFolder "$1" 0
 ' __ "{}"

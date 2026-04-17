@@ -33,7 +33,8 @@ fi
 export groupName=$(stat -c '%G' "$firstLine")
 
 
-cat "$folders.tmp" | xargs -P "$nProc" -I %% bash -c '
+cat "$folders.tmp" | tr '\n' '\0' | \
+xargs -0 -P "$nProc" -I %% bash -c '
   echo "Processing: $1"
 
   sudo find "$1" -maxdepth 1 \

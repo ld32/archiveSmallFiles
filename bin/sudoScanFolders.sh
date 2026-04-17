@@ -79,7 +79,8 @@ echo "Finding all subfolders in parallel, limited to $nProc concurrent processes
 
 if [ -f "$tempFile" ]; then 
   cat -n "$tempFile" 
-  cut -d$'\t' -f2 "$tempFile" | xargs -P "$nProc" -I "{}" bash -c '
+  cut -d$'\t' -f2 "$tempFile" | tr '\n' '\0' | \
+xargs -0 -P "$nProc" -I "{}" bash -c '
     printf "%s\n" "Processing $2";
     tmpFile=$(mktemp -p "$1" process_XXXXXX.out);
     errFile="${tmpFile%.out}.err";
