@@ -58,6 +58,8 @@ specialDirs=(
     "dir^with^caret"
     "dir~with~tilde"
     "dir space"
+    'dir"WithDouleQuotation'
+    "dirWithSingle'Quotation"
     "dir@#%&!()[]{};:,.=+^~$"
 )
 
