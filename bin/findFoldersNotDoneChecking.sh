@@ -38,6 +38,8 @@ else
     rm $logDir/notDoneFolders.txt
 fi
 
+echo "Archive checking results:" | tee -a summary
+
 echo "Actual folders: $(wc -l < $logDir/folders.txt)"
 
 echo "Done folders: $(wc -l < $logDir/done.all.txt)"
@@ -82,7 +84,7 @@ fi
 
 cat $logDir/done.check.$logDir.*.withCount | sort | uniq > $logDir/done.all.withCount
 
-echo "Archive checking results:" | tee -a summary
+
 echo "Total number of files if we  untar all the data (should be the same as untarred file count):" | tee -a summary 
 awk '{sum += $1} END {print sum}' $logDir/done.all.withCount | tee -a summary 
 
