@@ -27,11 +27,13 @@ function archiveFiles() {  #  $1 source path, 2 jobID 3 dest path 4 item 5 tmpFi
 
   #cat "$tmp.list" 
         ( cd "$1" && while IFS=$'\t' read -r file tp; do
-            [[ "$tp" == f ]] && md5sum -- "$file" || exit 1
-        done < "$tmp.list" ) > "$tmp.extract/$item.md5sum"
+		[[ "$tp" == f ]]  && { md5sum -- "$file" || exit 1; } || continue
+        done < "$tmp.list" ) > "$tmp.extract/$item.md5sum" 2>&1
         if [ $? -ne 0 ]; then 
           echo "Error: md5sum failed for $file in $1" | tee -a "$logDir/tarError$2.txt";  
-          return 1
+          cat "$tmp.extract/$item.md5sum"
+          cat "$tmp.list"
+	  return 1
         fi 
         #ls "$tmp.extract/$item.md5sum"
         #echo MD5 sum file:

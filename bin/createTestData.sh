@@ -214,4 +214,10 @@ if [ -f "$firstFile" ]; then
     ln -s "$firstFile" "$baseDir/dir_2/link"	
 fi
 
+for i in {1..5}; do 
+  mkdir -p $baseDir/folder/empty$i 
+done
+
+touch $baseDir/folder/emptyFile
+
 echo "Test data generation complete. It is in $baseDir. One folder and one file are set to not readable, so that you can test the scripts."
