@@ -272,7 +272,7 @@ if [[ "$runType" == local ]]; then
     #cat $logDir/folders.txt
 
     # tail -n +2 
-    cat $logDir/folders.txt | xargs -P 1 -I "{}" bash -c '
+    cat $logDir/folders.txt | tr '\n' '\0' | xargs -0 -P 1 -I "{}" bash -c '
         #set -x 
         #source $1;
         processFolder "$1" 0
@@ -381,9 +381,9 @@ elif [[ $runType == sbatch ]]; then
     echo "rm $logDir/subFolder\$1.check.txt 2>/dev/null" >> $logDir/job.sh
     
     if [ -z "$rowsToTry" ]; then  
-        echo "awk -v jIndex=\"\$jIndex\" -v nJobs=\"\$nJobs\" '( NR - 1 ) % nJobs == jIndex - 1' \"\$logDir/folders.txt\" | xargs -n 1 -P 1 -I {} bash -c '" >> $logDir/job.sh
+        echo "awk -v jIndex=\"\$jIndex\" -v nJobs=\"\$nJobs\" '( NR - 1 ) % nJobs == jIndex - 1' \"\$logDir/folders.txt\" | tr '\n' '\0' | xargs -0 -n 1 -P 1 -I {} bash -c '" >> $logDir/job.sh
     else 
-        echo "awk -v jIndex=\"\$jIndex\" -v nJobs=\"\$nJobs\" '( NR - 1 ) % nJobs == jIndex - 1' \"\$logDir/folders.txt\" | head -n $rowsToTry | xargs -n 1 -P 1 -I {} bash -c '" >> $logDir/job.sh
+        echo "awk -v jIndex=\"\$jIndex\" -v nJobs=\"\$nJobs\" '( NR - 1 ) % nJobs == jIndex - 1' \"\$logDir/folders.txt\" | head -n $rowsToTry | tr '\n' '\0' | xargs -0 -n 1 -P 1 -I {} bash -c '" >> $logDir/job.sh
     fi
 
     #echo "    set -x" >> $logDir/job.sh
