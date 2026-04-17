@@ -199,7 +199,6 @@ for ((i=1; i<=numLargeTarFiles && i<=numDirs; i++)); do
     echo "Creating large tar file: $tarFile"
     tar -cf "$tarFile" -C "$tarDir" .
     rm -rf "$tarDir"
-    ln -s "$dummyFile" "$dummyFile.link"
     
 done
 
