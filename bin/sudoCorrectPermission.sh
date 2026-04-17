@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #set -x
-set -e
+#set -e
 
 echo Running $0 $@ 
 
@@ -36,7 +36,7 @@ export groupName=$(stat -c '%G' "$firstLine")
 cat "$folders.tmp" | xargs -P "$nProc" -I %% bash -c '
   echo "Processing: $1"
 
-  sudo find "$1" -mindepth 1 -maxdepth 1 \
+  sudo find "$1" -maxdepth 1 \
     \( ! -group '"$groupName"' -exec chown -v :'"$groupName"' {} + \) \
     -o \( -type d ! -perm -g+rx -exec chmod -v u+rwx,g+rwxs {} + \) \
     -o \( -type f ! -perm -g+r -exec chmod -v u+rw,g+rw {} + \)

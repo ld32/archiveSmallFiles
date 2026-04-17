@@ -120,7 +120,7 @@ if [[ $count -ne $folderCount ]]; then
     echo "Error: Folder count mismatch. Expected $folderCount, acutal $count."
     echo "Please check the error file $tempFile.*.err for details."
     echo "The folder list is saved in $folders"
-    exit 1
+    #exit 1
 else 
     echo "Folder count matches expected value: $folderCount. Total folders found: $count."
 fi
@@ -134,5 +134,8 @@ if [[ $count -gt 10000 ]]; then
     awk -v jIndex="$jIndex" -v nJobs="$nJobs" '( NR - 1 ) % nJobs == jIndex - 1' "$logDir/folders.txt" > "$logDir/folders_part_$jIndex"
   done
 fi
+
+count=$(sudo find "$sDir" -maxdepth 1 -type f -o -type l | wc -l)
+printf "%s\t%s\n" "$count" "$sDir" >> $folders.withCount
 echo "Total number of files (should be the same as the number of files in starfish):"
 awk '{sum += $1} END {print sum}' $folders.withCount

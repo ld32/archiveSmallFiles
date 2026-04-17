@@ -3,7 +3,7 @@
 set -uo pipefail  # Ensure pipe failures propagate properly, python need this to work.
 
 set -e
-#set -x
+set -x
 
 echo Running $0 $@ 
 
@@ -56,32 +56,22 @@ tempFile=$(mktemp $logDir/tmpfile.XXXXXX)
 
 #trap "pkill -f 'sleep'; pkill -f 'sudo -v'; rm -r $dFolderTmp $tempFile $tempFile.txt  $tempFile.*.err $tempFile.*.txt 2>/dev/null;" EXIT
 
-#sudo ls -l "$sDir" 2>/dev/null | grep "^d" | awk -v dir="$sDir" '{print 0 "\t" dir "/" $9}' > $tempFile
+for i in {1..10}; do 
+    #set -x 
+    echo "Working on ${i}th level..."
+    [ -f "$tempFile" ] && rm "$tempFile"  
+    sudo find "$sDir" -mindepth $i -maxdepth $i -type d 2>> $tempFile.0.err | while read -r dir; do  
+      printf "%s\n" "Working on $dir"
+      count=$(sudo find "$dir" -maxdepth 1 -type f -o -type l | wc -l)
+      printf "%s\t%s\n" "$count" "$dir" >> "$tempFile"
+    done
+    [ -f $tempFile ] && x=$(wc -l < "$tempFile")  || x=0 
+    
+    [ "$x" -lt $limit ] || break
 
-sudo ls -lA "$sDir" 2>/dev/null | grep "^d" | awk -v dir="$sDir" '{for(i=9;i<=NF;i++) printf "%s%s", (i==9?"":OFS), $i; print ""}' | awk -v dir="$sDir" '{print 0 "\t" dir "/" $0}' > $tempFile
-                
-#sudo ls -l "$sDir" 2>/dev/null | grep "^d" | awk '{print 0 "\t" $sDir/$9}' > $tempFile
-count=$(wc -l < "$tempFile")
-if [ "$count" -le $limit ]; then 
-#    cat "$tempFile" >> $tempFile.0.txt
-#else
-    for i in {1..10}; do 
-        #set -x 
-        echo "Working on ${i}th level..."
-        [ -f "$tempFile" ] && rm "$tempFile"  
-        sudo find "$sDir" -mindepth $i -maxdepth $i -type d 2>> $tempFile.0.err | while read -r dir; do  
-          printf "%s\n" "Working on $dir"
-          count=$(sudo ls -lA "$dir" 2>/dev/null | awk '!/^d/ && !/^total/ {print $9}' | wc -l)
-          printf "%s\t%s\n" "$count" "$dir" >> "$tempFile"
-        done
-        [ -f $tempFile ] && x=$(wc -l < "$tempFile")  || x=0 
-        
-        [ "$x" -lt $limit ] || break
-
-        [ -f "$tempFile" ] &&  cat "$tempFile" >> $tempFile.0.txt
-        #sleep 2
-    done 
-fi 
+    [ -f "$tempFile" ] &&  cat "$tempFile" >> $tempFile.0.txt
+    #sleep 2
+done 
 
 #cat "$tempFile.0.txt"
 
@@ -89,17 +79,25 @@ echo "Finding all subfolders in parallel, limited to $nProc concurrent processes
 
 if [ -f "$tempFile" ]; then 
   cat -n "$tempFile" 
-  cut -d$'\t' -f2 "$tempFile" | xargs -P "$nProc" -I "{}" bash -c '
-    printf "%s\n" "Processing $2";
-    tmpFile=$(mktemp -p "$1" process_XXXXXX.out);
-    errFile="${tmpFile%.out}.err";
+   cut -d$'\t' -f2 "$tempFile" | tr '\n' '\0' | \
+xargs -0 -P "$nProc" -I "{}" bash -c '
+    dir="$2"
+    printf "Processing %s\n" "$dir"
 
-    sudo find "$2" -type d -print0 2>> "$errFile" | while IFS= read -r -d "" dir; do
-      printf "%s\n" "Working on directory: $dir";
-	count=$(sudo ls -lA "$dir" 2>/dev/null | awk '\''!/^d/ && !/^total/ {print $9}'\'' | wc -l)
-	printf "%s\t%s\n" "$count" "$dir" >> "$tmpFile"
+    tmpFile=$(mktemp -p "$1" process_XXXXXX.out)
+    errFile="${tmpFile%.out}.err"
+
+    sudo find "$dir" -type d -print0 2>> "$errFile" | \
+    while IFS= read -r -d "" subdir; do
+        printf "Working on directory: %s\n" "$subdir"
+
+        # Count regular files + symlinks (fast and reliable)
+        count=$(sudo find "$subdir" -maxdepth 1 \( -type f -o -type l \) 2>/dev/null | wc -l)
+
+        printf "%s\t%s\n" "$count" "$subdir" >> "$tmpFile"
     done
-  ' _ "$dFolderTmp" "{}"
+' _ "$dFolderTmp" "{}"
+		
 fi   
 
 cat "$dFolderTmp"/*.out > "$tempFile.1.txt" 2>/dev/null || echo Too less folders
@@ -144,8 +142,8 @@ if [[ $count -gt 10000 ]]; then
     awk -v jIndex="$jIndex" -v nJobs="$nJobs" '( NR - 1 ) % nJobs == jIndex - 1' "$logDir/folders.txt" > "$logDir/folders_part_$jIndex"
   done
 fi
+
 count=$(sudo find "$sDir" -maxdepth 1 -type f -o -type l | wc -l)
 printf "%s\t%s\n" "$count" "$sDir" >> $folders.withCount
-
 echo "Total number of files (should be the same as the number of files in starfish):"
 awk '{sum += $1} END {print sum}' $folders.withCount
