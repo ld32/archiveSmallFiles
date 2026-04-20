@@ -6,15 +6,15 @@
 echo Running $0 $@ 
 
 # make sure $2 is not empty and is a number
-if [[ -z "$2" || ! "$2" =~ ^[0-9]+$ ]]; then
-    echo "Usage: $0 <pass, for example: pass1> <nProcess>"
-    exit 1
-fi
+#if [[ -z "$2" || ! "$2" =~ ^[0-9]+$ ]]; then
+#    echo "Usage: $0 <pass, for example: pass1> <nProcess>"
+#    exit 1
+#fi
 
 [ -f "$1/folders.txt" ] || { echo "Folder list file $1/folders.txt does not exist."; exit 1; }
 
 folders="$1/folders.txt"
-nProc="$2"
+nProc=$(nproc)
 
 firstLine=$(head -n 1 "$folders")
 
@@ -32,11 +32,8 @@ fi
 
 export groupName=$(stat -c '%G' "$firstLine")
 
-
-cat "$folders.tmp" | tr '\n' '\0' | \
-xargs -0 -P "$nProc" -I %% bash -c '
+cat "$folders.tmp" | tr '\n' '\0' | xargs -0 -P "$nProc" -I %% bash -c '
   echo "Processing: $1"
-
   sudo find "$1" -maxdepth 1 \
     \( ! -group '"$groupName"' -exec chown -v :'"$groupName"' {} + \) \
     -o \( -type d ! -perm -g+rx -exec chmod -v u+rwx,g+rwxs {} + \) \

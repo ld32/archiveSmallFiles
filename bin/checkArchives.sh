@@ -59,15 +59,24 @@ function processFolder() { # sourceDir jobID
             # it is tar file and newly created within 7 days 
             elif [[ $file == *.tar ]] && `tar -tf "${path}/$file" | grep -qxF "${file%.tar}.md5sum"`; then 
                 countN=$((countN + 1))  
-                tarFiles="$tarFiles$(tar --wildcards --exclude='*.md5sum' -tvf "${path}/$file" |awk '{
-                    gsub(/^-/, "f", $1)
-                    name = ""
-    for (i = 6; i <= NF; i++) {
-        if ($i == "->") break
-        if (name == "") name = $i; else name = name " " $i
+                tarFiles="$tarFiles$(tar --wildcards --exclude='*.md5sum' -tvf "${path}/$file" | awk '
+{
+    # Determine type
+    type = substr($1, 1, 1)
+    if (type == "-") type = "f"
+    size = $3
+    # Remove the first 5 fields by deleting them from the start of the line
+    sub(/^[^ ]+ +[^ ]+ +[^ ]+ +[^ ]+ +[^ ]+ +/, "")
+
+    if (type == "l") {
+        split($0, a, " -> ")
+        printf "l\t%s\t%s\n", size,  a[1]
+    } else {
+        printf "%s\t%s\t%s\n", type, size, $0
     }
-                    print substr($1, 1, 1) "\t" $3 "\t" name
-                }' )\n"
+
+}' | sort)\n"
+ 
                 count=$((`echo -n "$tarFiles" | wc -l` + count + 1)) 
 
             elif [[ "$file" == *.zarr.zip ]]; then 
