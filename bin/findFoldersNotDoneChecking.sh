@@ -42,7 +42,7 @@ echo $logDir | tee -a summary
 
 echo "Archive checking results:" | tee -a summary
 
-echo "Actual folders: $(wc -l < $logDir/folders.txt)" | tee -a summary
+echo "Actual folders in $logDir/folders.txt: $(wc -l < $logDir/folders.txt)" | tee -a summary
 
 echo "Done folders: $(wc -l < $logDir/done.all.txt)" | tee -a summary
 
@@ -87,11 +87,13 @@ fi
 
 cat $logDir/done.check.$logDir.*.withCount | sort | uniq > $logDir/done.all.withCount
 
+echo "Total number of original files:" | tee -a summary
+awk '{sum += $1} END {printf "%'\''d\n", sum}' $logDir/done.all.withCount | tee -a summary
 
 echo "Total number of files if we  untar all the data (should be the same as untarred file count):" | tee -a summary 
-awk '{sum += $1} END {print sum}' $logDir/done.all.withCount | tee -a summary 
+awk '{sum += $2} END {printf "%'\''d\n", sum}' $logDir/done.all.withCount | tee -a summary 
 
 echo "Total number of files after tarring (should be the same the number of files in tarred folder in starfish):" | tee -a summary 
-awk '{sum += $2} END {print sum}' $logDir/done.all.withCount | tee -a summary 
+awk '{sum += $3} END {printf "%'\''d\n", sum}' $logDir/done.all.withCount | tee -a summary 
 
 

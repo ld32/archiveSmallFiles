@@ -11,7 +11,7 @@ date
 echo Running $0 $@ 
 
 echo which pass do are you prepariing for? 
-for i in {1..8}; do 
+for i in {1..18}; do 
     [ -d "pass$i" ] || { nextPass="pass$i"; break; }
 done
 

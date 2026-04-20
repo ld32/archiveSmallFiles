@@ -141,4 +141,4 @@ echo -e "Scan results (should match with the numbers in starfish):\nTotal number
 count=$(sudo find "$sDir" -maxdepth 1 -type f -o -type l | wc -l)
 printf "%s\t%s\n" "$count" "$sDir" >> $folders.withCount
 
-awk '{sum += $1} END {print sum}' $folders.withCount  | tee -a summary
+awk '{sum += $1} END {printf "%'\''d\n", sum}' $folders.withCount  | tee -a summary

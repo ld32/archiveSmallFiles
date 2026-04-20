@@ -49,6 +49,7 @@ function processFolder() { # sourceDir jobID
     #local tars=""
     local non_tars=""
     local tarFiles=""
+    local cout=$(echo -e "$oFiles" | grep -v ^d | wc -l)
     local count=0
     local countN=0
     while IFS=$'\t' read -r type size file; do
@@ -77,7 +78,7 @@ function processFolder() { # sourceDir jobID
 
 }' | sort)\n"
  
-                count=$((`echo -n "$tarFiles" | wc -l` + count + 1)) 
+                #count=$((`echo -n "$tarFiles" | wc -l` + count + 1)) 
 
             elif [[ "$file" == *.zarr.zip ]]; then 
                 countN=$((countN + 1))
@@ -91,12 +92,13 @@ function processFolder() { # sourceDir jobID
             fi    
         #fi
     done < <(find "$path" -maxdepth 1 -mindepth 1 \( -type f -o -type d \) -printf "%y\t%s\t%f\n") 
-
+    [ ! -z "$tarFiles" ] && count=$((`echo -e "$tarFiles" | wc -l` + count - 1))
     if [ -z "$oFiles" ]; then 
         if [ -z "$tarFiles$non_tars" ]; then 
             echo -e "empty folder, nothing to check: $sPath"
             printf '%b\n' "$1" >> $logDir/done.check.$pass.$2.txt 
-        else 
+            printf '0 0 0 %b\n' "$1" >> $logDir/done.check.$pass.$2.withCount 	
+	else 
             echo "Error: original files do not exist, but there are extra files in destination!!!"
         fi 
         return; 
@@ -137,7 +139,7 @@ function processFolder() { # sourceDir jobID
         #printf '%b\n' "$sPath" >> $logDir/reRun.check.$pass.txt
     else
         printf '%b\n' "$1" >> $logDir/done.check.$pass.$2.txt
-        echo $count $countN $1 >> $logDir/done.check.$pass.$2.withCount
+        echo $cout $count $countN $1 >> $logDir/done.check.$pass.$2.withCount
     fi
 
     #set +x 

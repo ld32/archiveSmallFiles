@@ -86,10 +86,10 @@ fi
 cat $logDir/done.check.$logDir.*.withCount | sort | uniq > $logDir/done.all.withCount
 
 echo "Total number of files if we  untar all the data (should be the same as untarred file count):" 
-awk '{sum += $1} END {print sum}' $logDir/done.all.withCount
+awk '{sum += $1} END {printf "%'\''d\n", sum}' $logDir/done.all.withCount
 
 echo "Total number of files after tarring (should be the same the number of files in starfish):"
-awk '{sum += $2} END {print sum}' $logDir/done.all.withCount
+awk '{sum += $2} END {printf "%'\''d\n", sum}' $logDir/done.all.withCount
 
 
 
