@@ -46,6 +46,7 @@ def process(batch, directory_path, zip_file_name):
                 print(f"{zip_file_name} does not exist.")
             
             sys.exit(1)
+            
 
     store.close()
     print(f"Batch stored in {zip_file_name}")
