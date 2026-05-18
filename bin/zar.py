@@ -1,6 +1,6 @@
 #!/bin/env python 
 
-import os, sys
+import os, re, sys
 import zarr
 import numpy as np
 import argparse
@@ -20,18 +20,31 @@ def process(batch, directory_path, zip_file_name):
     root = zarr.group(store=store)
 
     for entry in batch:
-        filename, file_type = entry.rsplit(' ', 1)
+        if not entry:
+            continue
+
+        parts = re.split(r'\s+', entry.strip(), maxsplit=1)
+        if len(parts) != 2:
+            print(f"Skipping malformed entry: {entry!r}")
+            continue
+
+        filename, file_type = parts
         file_path = os.path.join(directory_path, filename)
+        archive_name = f"{file_type}:{filename}"
         
         try:
+            if archive_name in root:
+                print(f"Skipping duplicate entry: {filename}")
+                continue
+
             if file_type == 'l':
                 link_target = os.readlink(file_path)
-                root.create_dataset(name=f"l:{filename}", data=np.array(list(link_target), dtype='|S1'), compressor=zarr.Blosc(cname="zstd", clevel=5))
+                root.create_dataset(name=archive_name, data=np.array(list(link_target), dtype='|S1'), compressor=zarr.Blosc(cname="zstd", clevel=5))
                 
             elif file_type == 'f':
                 with open(file_path, 'rb') as file:
                     binary_data = file.read()
-                root.create_dataset(name=f"f:{filename}", data=np.frombuffer(binary_data, dtype='u1'), compressor=zarr.Blosc(cname="zstd", clevel=5))
+                root.create_dataset(name=archive_name, data=np.frombuffer(binary_data, dtype='u1'), compressor=zarr.Blosc(cname="zstd", clevel=5))
                 
             else:
                 print(f"Unknown type '{file_type}' for file '{filename}'")
