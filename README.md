@@ -53,9 +53,12 @@ $ archiveFolders.sh tar local pass2
 
 #Check again: 
 $ findFoldersNotDoneArchiving.sh pass2
+...
+Actual folders: 2
+Done folders: 2
 
-# To check archives:
-$ checkArchives.sh tar local pass2
+# To check archives (We use pass1 because pass1 has full list of folders):
+$ checkArchives.sh tar local pass1
 
 # Some folders might not work due to permission or some other reason. 
 # Let's find the folders not done yet:

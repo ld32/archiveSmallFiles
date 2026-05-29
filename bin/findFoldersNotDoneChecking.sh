@@ -42,9 +42,16 @@ echo $logDir | tee -a summary
 
 echo "Archive checking results:" | tee -a summary
 
-echo "Actual folders in $logDir/folders.txt: $(wc -l < $logDir/folders.txt)" | tee -a summary
 
-echo "Done folders: $(wc -l < $logDir/done.all.txt)" | tee -a summary
+if [[ "$logDir" == pass1 ]]; then
+    echo "Actual folders: $(wc -l < $logDir/folders.txt)" | tee -a summary
+
+    echo "Done folders: $(wc -l < $logDir/done.all.txt)" | tee -a summary
+else 
+    echo "Actual folders: $(($(wc -l < $logDir/folders.txt) -1))" | tee -a summary
+
+    echo "Done folders: $(($(wc -l < $logDir/done.all.txt) -1))" | tee -a summary
+fi 
 
 [ -f $logDir/extraDoneFolders.txt ] && echo "Extra done folders: $(wc -l < $logDir/extraDoneFolders.txt)"
 
@@ -52,16 +59,18 @@ echo "Done folders: $(wc -l < $logDir/done.all.txt)" | tee -a summary
 if [ -f $logDir/notDoneFolders.txt ]; then 
     echo "Not done folders: $(wc -l < $logDir/notDoneFolders.txt)"
     
-    nextPass=pass$(( ${logDir#pass} + 1 ))
+    for i in {1..18}; do 
+        [ -d "pass$i" ] || { nextPass="pass$i"; break; }
+    done
 
-    if [ -f $nextPass/folders.txt ]; then 
-        echo "Next pass folders.txt already exists. It is renamed."
-        mv $nextPass/folders.txt $nextPass/folders.txt.$(date '+%Y-%m-%d_%H-%M-%S_%4N')
-    fi
+    # if [ -f $nextPass/folders.txt ]; then 
+    #     echo "Next pass folders.txt already exists. It is renamed."
+    #     mv $nextPass/folders.txt $nextPass/folders.txt.$(date '+%Y-%m-%d_%H-%M-%S_%4N')
+    # fi
 
-    if [ ! -d $nextPass ]; then 
+    #if [ ! -d $nextPass ]; then 
         mkdir -p $nextPass
-    fi
+    #fi
 
     # Check if the first row is the same
     first1=$(head -n 1 $logDir/folders.txt)
