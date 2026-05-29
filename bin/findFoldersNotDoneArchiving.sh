@@ -38,9 +38,16 @@ else
     rm $logDir/notDoneFolders.txt
 fi
 
-echo "Actual folders: $(wc -l < $logDir/folders.txt)"
+if [[ "$logDir" == pass1 ]]; then
+    echo "Actual folders: $(wc -l < $logDir/folders.txt)"
 
-echo "Done folders: $(wc -l < $logDir/done.all.txt)"
+    echo "Done folders: $(wc -l < $logDir/done.all.txt)"
+else 
+    echo "Actual folders: $(($(wc -l < $logDir/folders.txt) -1))"
+
+    echo "Done folders: $(($(wc -l < $logDir/done.all.txt) -1))"
+fi 
+
 [ -f $logDir/extraDoneFolders.txt ] && echo "Extra done folders: $(wc -l < $logDir/extraDoneFolders.txt)"
 
 
@@ -82,6 +89,7 @@ if [ -f $logDir/notDoneFolders.txt ]; then
     echo "\$ archiveFolders.sh tar local/sbatch $nextPass"
 fi 
 
+echo 
 
 # cat $logDir/done.check.$logDir.*.withCount | sort | uniq > $logDir/done.all.withCount
 

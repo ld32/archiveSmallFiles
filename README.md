@@ -38,18 +38,21 @@ archiveFolders.sh tar local pass1
 # Let's find the folders not done yet:
 $ findFoldersNotDoneArchiving.sh pass1
 ...
-Actual folders: 55
-Done folders: 53
+Actual folders: 65
+Done folders: 63
 Not done folders: 2
 Not done folders are saved to pass2/folders.txt.
 Please review logs and see what is the issue: 
 $ cat pass1/tarError* 
 
-If there is permission issues, please run (with 4 processes): 
+#If there is permission issues, please run (with 4 processes): 
 $ sudoCorrectPermission.sh pass2 4
 
-Aftet that, you can run the next pass now:
+#Aftet that, you can run the next pass now:
 $ archiveFolders.sh tar local pass2
+
+#Check again: 
+$ findFoldersNotDoneArchiving.sh pass2
 
 # To check archives:
 $ checkArchives.sh tar local pass2
