@@ -21,8 +21,8 @@ $ createTestData.sh
 Test data generation complete. It is in /home/xyz/tarTesting/TestingData. 
 One folder and one file are set to not readable, so that you can test the scripts.
 
-# To scan folders:
-$ sudoScanFolders.sh TestingData/ 1 55
+# To scan folders (with 1 process):
+$ sudoScanFolders.sh TestingData/ 1 55 2>&1 | tee scan.log
 ...
 Folder count matches expected value: 55. Total folders found: 55.
 
@@ -40,14 +40,14 @@ Not done folders are saved to pass2/folders.txt.
 Please review logs and see what is the issue: 
 $ cat pass1/tarError* 
 
-If there is permission issues, please run: 
+If there is permission issues, please run (with 4 processes): 
 $ sudoCorrectPermission.sh pass2 4
 
-Aftet that, you can run the next pass now: pass2
+Aftet that, you can run the next pass now:
 $ archiveFolders.sh tar local pass2
 
 # To check archives:
-$ checkArchives.sh tar local pass
+$ checkArchives.sh tar local pass2
 
 # Some folders might not work due to permission or some other reason. 
 # Let's find the folders not done yet:
@@ -60,7 +60,7 @@ Not done folders are saved to pass2/folders.txt.
 Please review logs and see what is the issue: 
 $ cat pass1/tarError* 
 
-If there is permission issues, please run: 
+If there is permission issues, please run (with 4 processes): 
 $ sudoCorrectPermission.sh pass2 4
 
 Aftet that, you can run the next pass now: pass2
@@ -102,7 +102,7 @@ $ cd tarForReal
 # Check Starfish website and find the actul folder count, 
 # for example 5500000 folders, 
 # then scan folders using 20 processes:
-$ sudoScanFolders.sh /n/data1/xyz/.snapshot/daily.2026.2.1/someData 20 5500000
+$ sudoScanFolders.sh /n/data1/xyz/.snapshot/daily.2026.2.1/someData 20 5500000 2>&1 | tee scan.log
 ...
 Folder count matches expected value: 55000000. 
 Total folders found: 55000000.
