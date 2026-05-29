@@ -22,9 +22,14 @@ Test data generation complete. It is in /home/xyz/tarTesting/TestingData.
 One folder and one file are set to not readable, so that you can test the scripts.
 
 # To scan folders (with 1 process):
-$ sudoScanFolders.sh TestingData/ 1 55 2>&1 | tee scan.log
+$ sudoScanFolders.sh TestingData/ 1 65 2>&1 | tee scan.log
 ...
-Folder count matches expected value: 55. Total folders found: 55.
+Folder count matches expected value: 65. Total folders found: 65.
+Scan results (should match with the numbers in starfish):
+Total number of folders:
+65
+And total number of files:
+365
 
 # To archive using tar:
 archiveFolders.sh tar local pass1
