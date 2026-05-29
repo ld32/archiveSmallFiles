@@ -97,7 +97,7 @@ fi
 cat $logDir/done.check.$logDir.*.withCount | sort | uniq > $logDir/done.all.withCount
 
 echo "Total number of original files:" | tee -a summary
-awk '{sum += $1} END {printf "%'\''d\n", sum}' $logDir/done.all.withCount | tee -a summary
+awk '{sum += $1} END {printf "%'\''d\n", sum}' $logDir/folders.txt.withCount | tee -a summary
 
 echo "Total number of files if we  untar all the data (should be the same as untarred file count):" | tee -a summary 
 awk '{sum += $2} END {printf "%'\''d\n", sum}' $logDir/done.all.withCount | tee -a summary 
