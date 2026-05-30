@@ -97,13 +97,25 @@ if [ -f $logDir/notDoneFolders.txt ]; then
 
     echo "Not done folders are saved to $nextPass/folders.txt."
     echo 
-    echo "Please review logs and see what is the issue:" 
+    echo "#Please review logs and see what is the issue:" 
     echo "\$ cat $logDir/tarError*"
     echo
-    echo "If there is permission issues, please run:" 
+    echo "#If there is permission issues, please run:" 
     echo "\$ sudoCorrectPermission.sh $nextPass 4"
     echo
-    echo "Aftet that, you can run the next pass: $nextPass"
+    echo "#Aftet that, you can archive them:"
+    echo "\$ archiveFolders.sh tar local/sbatch $nextPass"
+
+    echo
+    echo "#Aftet that, you can run the next pass:"
     echo "\$ checkArchives.sh tar local/sbatch $nextPass"
 
+    echo
+    echo "#Then:"
+    echo "\$ findFoldersNotDoneChecking.sh $nextPass"
+
+
+
 fi 
+
+echo 

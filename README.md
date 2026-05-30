@@ -64,18 +64,33 @@ $ checkArchives.sh tar local pass1
 # Let's find the folders not done yet:
 $ findFoldersNotDoneChecking.sh pass1
 ...
-Actual folders: 55
-Done folders: 53
+pass1
+Archive checking results:
+Actual folders: 65
+Done folders: 63
+Total number of original files:
+365
+Total number of files if we  untar all the data (should be the same as untarred file count):
+348
+Total number of files after tarring (should be the same the number of files in tarred folder in starfish):
+57
 Not done folders: 2
-Not done folders are saved to pass2/folders.txt.
-Please review logs and see what is the issue: 
-$ cat pass1/tarError* 
+Not done folders are saved to pass3/folders.txt.
 
-If there is permission issues, please run (with 4 processes): 
-$ sudoCorrectPermission.sh pass2 4
+Please review logs and see what is the issue:
+$ cat pass1/tarError*
 
-Aftet that, you can run the next pass now: pass2
-$ checkArchives.sh tar local pass2
+If there is permission issues, please run:
+$ sudoCorrectPermission.sh pass3 4
+
+Aftet that, you can archive them: 
+$ archiveFolders.sh tar local/sbatch pass3
+
+Aftet that, you can run the next pass now:
+$ checkArchives.sh tar local pass3
+
+Then:
+$ findFoldersNotDoneChecking.sh pass3
 
 # To randomly un-archieve 10 folder and compare with original using diff command:
 randomUnArchiveToCheck.sh tar pass1 10
