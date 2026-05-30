@@ -77,16 +77,16 @@ Total number of files after tarring (should be the same the number of files in t
 Not done folders: 2
 Not done folders are saved to pass3/folders.txt.
 
-Please review logs and see what is the issue:
+#Please review logs and see what is the issue:
 $ cat pass1/tarError*
 
-If there is permission issues, please run:
+#If there is permission issues, please run:
 $ sudoCorrectPermission.sh pass3 4
 
-Aftet that, you can archive them: 
+#Aftet that, you can archive them: 
 $ archiveFolders.sh tar local/sbatch pass3
 
-Aftet that, you can run the next pass now:
+#Aftet that, you can run the next pass now:
 $ checkArchives.sh tar local pass3
 
 Then:
