@@ -156,10 +156,10 @@ Not done folders are saved to pass2/folders.txt.
 Please review logs and see what is the issue: 
 $ cat pass1/tarError* 
 
-If there is permission issues, please run: 
+# If there is permission issues, please run: 
 $ sudoCorrectPermission.sh pass2 4
 
-Aftet that, you can run the next pass now: pass2
+# Aftet that, you can run the next pass now: pass2
 $ archiveFolders.sh tar sbatch pass2
 
 # To check archives:
@@ -176,14 +176,14 @@ Not done folders are saved to pass2/folders.txt.
 Please review logs and see what is the issue: 
 $ cat pass1/tarError* 
 
-If there is permission issues, please run: 
+# If there is permission issues, please run: 
 $ sudoCorrectPermission.sh pass2 4
 
-Aftet that, you can run the next pass now: pass2
+# Aftet that, you can run the next pass now: pass2
 $ checkArchives.sh tar sbatch pass2
 
 # To randomly un-archieve 10 folder and compare with original:
-randomUnarchiveToCheck.sh tar pass1 10
+$ randomUnarchiveToCheck.sh tar pass1 10
 
 # When we help with lab data, the tarred data 
 # need set proper ownership and permission.
