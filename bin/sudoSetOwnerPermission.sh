@@ -59,6 +59,8 @@ if [ ! -f $logDir/folders.txt ]; then
     exit 1
 fi
 
+sudo -v || { echo "sudo authentication failed"; exit 1; }
+
 echo star time $(date)
 
 cat $logDir/folders.txt | tr '\n' '\0' | \

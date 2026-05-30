@@ -13,8 +13,10 @@ echo Running $0 $@
 
 [ -f "$1/folders.txt" ] || { echo "Folder list file $1/folders.txt does not exist."; exit 1; }
 
+sudo -v || { echo "sudo authentication failed"; exit 1; }
+
 folders="$1/folders.txt"
-nProc=$(nproc)
+nProc=$2
 
 firstLine=$(head -n 1 "$folders")
 

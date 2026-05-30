@@ -13,6 +13,8 @@ permission=$2
 
 groupName=$(stat -c '%G' "$rootPath")
 
+sudo -v || { echo "sudo authentication failed"; exit 1; }
+
 if [[ "$permission" == readOnly ]]; then 
    sudo find "$rootPath" \
     \( ! -group "$groupName" -exec chown -v :"$groupName" {} + \) \

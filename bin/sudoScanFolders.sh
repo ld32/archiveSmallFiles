@@ -50,6 +50,8 @@ if [ -f $folders ]; then
   fi 
 fi 
 
+sudo -v || { echo "sudo authentication failed"; exit 1; }
+
 dFolderTmp=$(mktemp -d $logDir/tmp.XXXXXX)
 
 tempFile=$(mktemp $logDir/tmpfile.XXXXXX)

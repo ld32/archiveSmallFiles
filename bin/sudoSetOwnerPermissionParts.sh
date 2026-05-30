@@ -28,19 +28,19 @@ export -f processFolder
 #[[ "${BASH_SOURCE[0]}" != "${0}" ]] && return  
 
 usage() {
-    echo "Usage: $0 <pass, for example: pass1> <part, for eample 1. There are totally 6 parts.>"; exit 1;
+    echo "Usage: $0 <pass, for example: pass1><part, for eample 1. There are totally 6 parts.>"; exit 1;
 }
 
 date
 echo Running $0 $@ 
 
-set -x 
+#set -x 
 
 export pass="$1"
 
-export nJobs="$3" 
+export nJobs="$2" 
 
-export folderFile="folders_part_$2"
+export folderFile="folders_part_$3"
 
 sFolder=`head -n 1 $pass/$folderFile`
 
@@ -58,6 +58,8 @@ if [ ! -f $logDir/$folderFile ]; then
     echo "Error: $folderFile does not exist. Please run the script with pass1 or create $folderFile."
     exit 1
 fi
+
+sudo -v || { echo "sudo authentication failed"; exit 1; }
 
 echo star time $(date)
 

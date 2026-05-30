@@ -193,22 +193,22 @@ $ sudoSetOwnerPermission.sh pass1 4
 
 # Or if folder list is huge, run 6 interactive 
 # jobs and each job run 1 subset folders: 
-# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
+$ srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
 $ sudoSetOwnerPermissionParts.sh pass1 4 1
 
 # srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
 $ sudoSetOwnerPermissionParts.sh pass1 4 2
 
-# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
+$ srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
 $ sudoSetOwnerPermissionParts.sh pass1 4 3
 
-# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
+$ srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
 $ sudoSetOwnerPermissionParts.sh pass1 4 4
 
-# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
+$ srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
 $ sudoSetOwnerPermissionParts.sh pass1 4 5
 
-# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
+$ srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
 $ sudoSetOwnerPermissionParts.sh pass1 4 6
 
 # Sometimes, an .snapshot may outdated. 
