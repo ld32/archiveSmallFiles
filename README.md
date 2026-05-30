@@ -163,7 +163,7 @@ Aftet that, you can run the next pass now: pass2
 $ archiveFolders.sh tar sbatch pass2
 
 # To check archives:
-$ checkArchives.sh tar local pass
+$ checkArchives.sh tar local1 pass
 
 # Some folders might not work due to permission or some other reason. 
 # Let's find the folders not done yet:
@@ -189,27 +189,27 @@ randomUnarchiveToCheck.sh tar pass1 10
 # need set proper ownership and permission.
 # If folder list is not very large, 
 # set ownership and permission using 4 processes: 
-$ sudoSetOwnerPermision.sh pass1 4
+$ sudoSetOwnerPermission.sh pass1 4
 
 # Or if folder list is huge, run 6 interactive 
 # jobs and each job run 1 subset folders: 
 # srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermisionParts.sh pass1 4 1
+$ sudoSetOwnerPermissionParts.sh pass1 4 1
 
 # srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermision.sh pass1 4 2
+$ sudoSetOwnerPermission.sh pass1 4 2
 
 # srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermision.sh pass1 4 3
+$ sudoSetOwnerPermission.sh pass1 4 3
 
 # srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermision.sh pass1 4 4
+$ sudoSetOwnerPermission.sh pass1 4 4
 
 # srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermision.sh pass1 4 5
+$ sudoSetOwnerPermission.sh pass1 4 5
 
 # srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermision.sh pass1 4 6
+$ sudoSetOwnerPermission.sh pass1 4 6
 
 # Sometimes, an .snapshot may outdated. 
 # To updata .snapshot version with the folder paths: 
