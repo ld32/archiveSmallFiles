@@ -6,10 +6,6 @@ git clone https://github.com/ld32/archiveSmallFiles.git
 
 export PATH=$PWD/archiveSmallFiles/bin:$PATH
 
-# If you don't have sudo permission, please using the guild: 
-https://github.com/ld32/archiveSmallFiles/blob/master/README_noSudo.md
-
-
 ## Practice with testing data
 
 ```
@@ -25,8 +21,13 @@ $ createTestData.sh
 Test data generation complete. It is in /home/xyz/tarTesting/TestingData. 
 One folder and one file are set to not readable, so that you can test the scripts.
 
+# Correct permission: assuming all the data belong to the user's group, set everything group readable
+$ find TestingData -exec sh -c 'for f; do [ -d "$f" ] && chmod 775 "$f" || chmod 664 "$f"; done' sh {} +
+
+# If there is any error and need sudo command to set permision, please contact data owner or rchelp@hms.harvard.edu for help 
+
 # To scan folders (with 1 process):
-$ sudoScanFolders.sh TestingData/ 1 65 2>&1 | tee scan.log
+$ scanFolders.sh TestingData/ 1 65 2>&1 | tee scan.log
 ...
 Folder count matches expected value: 65. Total folders found: 65.
 Scan results (should match with the numbers in starfish):
@@ -49,8 +50,10 @@ Not done folders are saved to pass2/folders.txt.
 Please review logs and see what is the issue: 
 $ cat pass1/tarError* 
 
-#If there is permission issues, please run (with 4 processes): 
-$ sudoCorrectPermission.sh pass2 4
+# If there is permission issues, please run: 
+$ find TestingData -exec sh -c 'for f; do [ -d "$f" ] && chmod 775 "$f" || chmod 664 "$f"; done' sh {} +
+
+# If there is any error and need sudo command to set permision, please contact data owner or rchelp@hms.harvard.edu for help 
 
 #Aftet that, you can run the next pass now:
 $ archiveFolders.sh tar local pass2
@@ -84,8 +87,10 @@ Not done folders are saved to pass3/folders.txt.
 #Please review logs and see what is the issue:
 $ cat pass1/tarError*
 
-#If there is permission issues, please run:
-$ sudoCorrectPermission.sh pass3 4
+# If there is permission issues, please run: 
+$ find TestingData -exec sh -c 'for f; do [ -d "$f" ] && chmod 775 "$f" || chmod 664 "$f"; done' sh {} +
+
+# If there is any error and need sudo command to set permision, please contact data owner or rchelp@hms.harvard.edu for help 
 
 #Aftet that, you can archive them: 
 $ archiveFolders.sh tar local/sbatch pass3
@@ -109,9 +114,9 @@ $ find dataFolder -name "*.tar" -print0 | xargs -0 -P 4 -I {} sh -c 'tar --overw
  $ find $sPath -maxdepth 1 -mindepth 1 \( -type f -o -type l \) ! -name "*.md5sum" -print0 | xargs -0 -I {} sh -c '
                 if [[ "$1" == *.tar ]]; then
                     if tar -tf "$1" | grep -qxF "${1%.tar}.md5sum" || [ -f ${1%.tar}.md5sum ]; then
-                            sudo tar --exclude ".md5sum" --overwrite -xf "$1" -C "$2"
+                            tar --exclude ".md5sum" --overwrite -xf "$1" -C "$2"
                         else
-                            sudo cp -a "$1" "$2/"
+                            cp -a "$1" "$2/"
                         fi
                     fi    
             ' _ {} $dPath
@@ -129,10 +134,16 @@ $ cd /some/big/storage/
 $ mkdir -p tarFprReal 
 $ cd tarForReal
 
+# Correct permission: assuming all the data belong to the user's group, set everything group readable
+$ find /n/data1/xyz/someData -exec sh -c 'for f; do [ -d "$f" ] && chmod 775 "$f" || chmod 664 "$f"; done' sh {} +
+
+# If there is any error and need sudo command to set permision, please contact data owner or rchelp@hms.harvard.edu for help 
+
+# Wait for next day and use new snapshot to scan folders
 # Check Starfish website and find the actul folder count, 
 # for example 5500000 folders, 
 # then scan folders using 20 processes:
-$ sudoScanFolders.sh /n/data1/xyz/.snapshot/daily.2026.2.1/someData 20 5500000 2>&1 | tee scan.log
+$ scanFolders.sh /n/data1/xyz/.snapshot/daily.2026.2.1/someData 20 5500000 2>&1 | tee scan.log
 ...
 Folder count matches expected value: 55000000. 
 Total folders found: 55000000.
@@ -161,7 +172,13 @@ Please review logs and see what is the issue:
 $ cat pass1/tarError* 
 
 # If there is permission issues, please run: 
-$ sudoCorrectPermission.sh pass2 4
+$ find TestingData -exec sh -c 'for f; do [ -d "$f" ] && chmod 775 "$f" || chmod 664 "$f"; done' sh {} +
+
+# If there is any error and need sudo command to set permision, please contact data owner or rchelp@hms.harvard.edu for help 
+
+# Wait for the new .snapshot and update to use new .snapshot
+# To updata .snapshot version with the folder paths: 
+$ updateSnapshotVersion.sh
 
 # Aftet that, you can run the next pass now: pass2
 $ archiveFolders.sh tar sbatch pass2
@@ -181,39 +198,19 @@ Please review logs and see what is the issue:
 $ cat pass1/tarError* 
 
 # If there is permission issues, please run: 
-$ sudoCorrectPermission.sh pass2 4
+$ find /n/data1/xyz/someData -exec sh -c 'for f; do [ -d "$f" ] && chmod 775 "$f" || chmod 664 "$f"; done' sh {} +
+
+# If there is any error and need sudo command to set permision, please contact data owner or rchelp@hms.harvard.edu for help 
+
+# Wait for the new .snapshot and update to use new .snapshot
+# To updata .snapshot version with the folder paths: 
+$ updateSnapshotVersion.sh
 
 # Aftet that, you can run the next pass now: pass2
 $ checkArchives.sh tar sbatch pass2
 
 # To randomly un-archieve 10 folder and compare with original:
 $ randomUnarchiveToCheck.sh tar pass1 10
-
-# When we help with lab data, the tarred data 
-# need set proper ownership and permission.
-# If folder list is not very large, 
-# set ownership and permission using 4 processes: 
-$ sudoSetOwnerPermission.sh pass1 4
-
-# Or if folder list is huge, run 6 interactive 
-# jobs and each job run 1 subset folders: 
-$ srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermissionParts.sh pass1 4 1
-
-# srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermissionParts.sh pass1 4 2
-
-$ srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermissionParts.sh pass1 4 3
-
-$ srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermissionParts.sh pass1 4 4
-
-$ srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermissionParts.sh pass1 4 5
-
-$ srun -p short --mem 8G -t 5:0:0 --pty /bin/bash
-$ sudoSetOwnerPermissionParts.sh pass1 4 6
 
 # Sometimes, an .snapshot may outdated. 
 # To updata .snapshot version with the folder paths: 
