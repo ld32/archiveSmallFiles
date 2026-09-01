@@ -88,12 +88,14 @@ fromStarfish() {
   local volume="${STARFISH_TO_O2[$best_prefix]}"
   local rel="${sf_path#$best_prefix}"
   
+
+  # Print Starfish URL unless suppressed
+  [[ -z "$suppress_url" ]] && printf '%s%s\n' "https://starfish.med.harvard.edu/#/overview?volume=${best_prefix}&path=$rel"
+  
+  
   if [[ "$volume" == /n/standby* ]]; then
     rel="${rel#data}"
   fi
-  
-  # Print Starfish URL unless suppressed
-  [[ -z "$suppress_url" ]] && printf '%s%s\n' "https://starfish.med.harvard.edu/#/overview?volume=${best_prefix}&path=$rel"
   
   # Print O2 local path
   printf '%s%s\n' "$volume" "$rel"
