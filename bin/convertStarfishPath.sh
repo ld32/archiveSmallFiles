@@ -92,7 +92,7 @@ fromStarfish() {
   # Print Starfish URL unless suppressed
   [[ -z "$suppress_url" ]] && printf '%s%s\n' "https://starfish.med.harvard.edu/#/overview?volume=${best_prefix}&path=$rel"
   
-  
+
   if [[ "$volume" == /n/standby* ]]; then
     rel="${rel#data}"
   fi
@@ -127,6 +127,12 @@ fromURL() {
   fromStarfish "$sf_path" 1
 }
 
+usage() {
+  echo "Usage: $0 <path>"
+  echo "  <path> can be an O2 local path, a Starfish volume path, or a Starfish URL."
+  echo "  The script will convert the input to the other formats."
+  exit 1
+}
 # Main script entry point
 path="$1"
 
@@ -136,9 +142,21 @@ elif [[ "$path" == https* ]]; then
   if [[ "$path" == *"?"* && "$path" != *"&"* ]]; then
     echo "Error: The URL appears truncated at an unquoted '&'." >&2
     echo "Please use quotes around the URL to avoid shell interpretation." >&2
-    exit 1
+    usage
   fi
   fromURL "$path"
 else 
+  # need make sure the value is in the form of Volume:relative/path
+  if [[ "$path" != *:* ]]; then
+    echo "Error: The Starfish path must be in the form of Volume:relative/path." >&2
+    usage
+  else 
+    # check if the volume is valid
+    local best_prefix=$(find_best_prefix "$path" STARFISH_TO_O2)
+    if [[ -z "$best_prefix" ]]; then
+      echo "Error: No local path mapping for $path" >&2
+      usage
+    fi
+  fi  
   fromStarfish "$path"
 fi
