@@ -31,7 +31,7 @@ One folder and one file are set to not readable, so that you can test the script
 $ sudoScanFolders.sh TestingData/ 1 65 2>&1 | tee scan.log
 ...
 Folder count matches expected value: 65. Total folders found: 65.
-Scan results (should match with the numbers in starfish):
+Scan results (should match with the numbers in starfish, try this useful tool: convertStarfishPath.sh):
 Total number of folders:
 65
 And total number of files:
