@@ -15,7 +15,7 @@ function processFolder() {
     #local owner=$(stat -c '%U:%G' "$sDir")
     local owner=$(stat -c '%u:%g' "$sDir")
     sudo chmod g+rwx "$dDir" && sudo chown $owner "$dDir"
-    find  "$dDir" -maxdepth 1 -maxdepth 1 -type f | xargs -I {} -P 1 bash -c '
+    sudo find  "$dDir" -maxdepth 1 -maxdepth 1 -type f | xargs -I {} -P 1 bash -c '
         sudo chmod ug+rw "$1"
         sudo chown "$2" "$1"
     ' _ "{}" "$owner"
@@ -60,7 +60,7 @@ if [ ! -f $logDir/$folderFile ]; then
 fi
 
 sudo -v || { echo "sudo authentication failed"; exit 1; }
-( while true; do sudo -n true; sleep 250; kill -0 "$$" 2>/dev/null || exit; done ) &
+( while true; do sudo -n -v; sleep 250; kill -0 "$$" 2>/dev/null || exit; done ) &
 KEEPALIVE=$!
 trap 'kill $KEEPALIVE 2>/dev/null' EXIT
 
