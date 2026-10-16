@@ -14,6 +14,9 @@ echo Running $0 $@
 [ -f "$1/folders.txt" ] || { echo "Folder list file $1/folders.txt does not exist."; exit 1; }
 
 sudo -v || { echo "sudo authentication failed"; exit 1; }
+( while true; do sudo -n true; sleep 250; kill -0 "$$" 2>/dev/null || exit; done ) &
+KEEPALIVE=$!
+trap 'kill $KEEPALIVE 2>/dev/null' EXIT
 
 folders="$1/folders.txt"
 nProc=$2
