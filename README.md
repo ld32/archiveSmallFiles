@@ -230,7 +230,7 @@ $ sudoCorrectPermission.sh pass5 4
 $ checkArchives.sh tar local pass5
 
 # To randomly un-archieve 10 folder and compare with original:
-$ randomUnarchiveToCheck.sh tar pass1 10
+$ randomUnArchiveToCheck.sh tar pass1 10
 
 # When we help with lab data, the tarred data 
 # need set proper ownership and permission.
