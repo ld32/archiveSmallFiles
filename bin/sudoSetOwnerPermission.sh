@@ -60,6 +60,9 @@ if [ ! -f $logDir/folders.txt ]; then
 fi
 
 sudo -v || { echo "sudo authentication failed"; exit 1; }
+( while true; do sudo -n true; sleep 250; kill -0 "$$" 2>/dev/null || exit; done ) &
+KEEPALIVE=$!
+trap 'kill $KEEPALIVE 2>/dev/null' EXIT
 
 echo star time $(date)
 

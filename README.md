@@ -165,28 +165,66 @@ $ cat pass1/tarError*
 # If there is permission issues, please run: 
 $ sudoCorrectPermission.sh pass2 4
 
-# Aftet that, you can run the next pass now: pass2
-$ archiveFolders.sh tar sbatch pass2
+# Aftet that, wait overnight for new snapshot and update snap version
+$ updateSnapshotVersion.sh
+Running /home/archiveSmallFiles/bin/updateSnapshotVersion.sh
+which pass do are you prepariing for?
+Please select the folders.txt you want to process or type q to quit:
+1       pass1/folders.txt
+2       pass2/folders.txt
+2
+Found newer snapshot(s) than the one in folders.txt:
+/.snapshot/systems_2025-12-16_00_00_06_UTC
+Do you want to use the newer snapshot and update the folders.txt? [y/n]
+y
+Redy to run for pass3/folders.txt
 
-# To check archives:
-$ checkArchives.sh tar local1 pass
+# After updating the snap version, you can run the next pass now: pass3
+# If there are only a few folders, does not need to submit Slurm job
+$ archiveFolders.sh tar local pass3
+# Otherwise:
+$ archiveFolders.sh tar sbatch pass3
+
+# check if archiving is done for this passs
+$ findFoldersNotDoneArchiving.sh pass3
+Running /home/archiveSmallFiles/bin/findFoldersNotDoneArchiving.sh pass3
+Actual folders: 8
+Done folders: 8
+
+# To check archives, we need the full list of folder and updated .snap version:
+$ updateSnapshotVersion.sh
+Running /home/archiveSmallFiles/bin/updateSnapshotVersion.sh
+which pass do are you prepariing for?
+Please select the folders.txt you want to process or type q to quit:
+1       pass1/folders.txt
+2       pass2/folders.txt
+3       pass3/folders.txt
+1
+Found newer snapshot(s) than the one in folders.txt:
+/.snapshot/systems_2025-12-16_00_00_06_UTC
+Do you want to use the newer snapshot and update the folders.txt? [y/n]
+y
+Redy to run for pass4/folders.txt
+
+
+$ checkArchives.sh tar sbatch pass4
 
 # Some folders might not work due to permission or some other reason. 
 # Let's find the folders not done yet:
-$ findFoldersNotDoneChecking.sh pass1
+$ findFoldersNotDoneChecking.sh pass4
 ...
 Actual folders: 5500000
 Done folders: 5499999
 Not done folders: 1
-Not done folders are saved to pass2/folders.txt.
+Not done folders are saved to pass5/folders.txt.
 Please review logs and see what is the issue: 
 $ cat pass1/tarError* 
 
 # If there is permission issues, please run: 
-$ sudoCorrectPermission.sh pass2 4
+$ sudoCorrectPermission.sh pass5 4
 
-# Aftet that, you can run the next pass now: pass2
-$ checkArchives.sh tar sbatch pass2
+# Aftet that, you can run the next pass now: pass5
+$ checkArchives.sh tar local pass5
 
 # To randomly un-archieve 10 folder and compare with original:
 $ randomUnarchiveToCheck.sh tar pass1 10
