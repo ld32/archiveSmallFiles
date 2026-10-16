@@ -148,8 +148,11 @@ pass1/folders_part_4
 pass1/folders_part_5
 pass1/folders_part_6
 
+# !!!!!!!!!
+# After starting the scanner, ask DevOpt team to add your user name to the group
+
 # To archive using tar using Slurm jobs, each job run 10k folders:
-archiveFolders.sh tar sbatch pass1
+$ archiveFolders.sh tar sbatch pass1
 
 # Some folders might not work due to permission or some other reason. 
 # Let's find the folders not done yet:
