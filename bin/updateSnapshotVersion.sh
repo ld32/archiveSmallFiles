@@ -68,10 +68,16 @@ if [ ! -z "$newSanpshot" ] && [[ "$newSanpshot" != "$snapshotPath" ]]; then
             echo "Backed up folders.txt to $nextPass/folders.txt.$(date '+%Y-%m-%d_%H-%M-%S_%4N')"
         fi     
         sed  "s|$snapshotPath|$newSanpshot|g" "$folders" > "$nextPass/folders.txt"
+        sed "s|$snapshotPath|$newSanpshot|g" "$folders.withCount" > "$nextPass/folders.txt.withCount" 2>/dev/null || true  
+        sed "s|$snapshotPath|$newSanpshot|g" "$folders.withCount.sorted" > "$nextPass/folders.txt.withCount.sorted" 2>/dev/null || true
+        echo "Updated folders.txt to use the newer snapshot: $newSanpshot"
     fi 
 else 
     mkdir -p "$nextPass"
     cp $folders "$nextPass/folders.txt"
+    cp $folders.withCount "$nextPass/folders.txt.withCount" 2>/dev/null || true
+    cp $folders.withCount.sorted "$nextPass/folders.txt.withCount.sorted" 2>/dev/null || true
+    echo "Copied $folders to $nextPass/folders.txt"
 fi 
 
 echo Redy to run for $nextPass/folders.txt
