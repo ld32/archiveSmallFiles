@@ -607,7 +607,7 @@ xargs -0 -P 1 -I {} bash -c '" >> $logDir/job.sh
             echo submitted ${output##* }/$i >> $logDir/runTime.txt
             #dep="-d afterok:$output" 
         else        # -w $node
-            cmd="sbatch $dep --qos=testbump --parsable -c 1 -A rccg -o $logDir/slurm.$pass.$i.txt -J ${dFolder##*/}.$i -t 12-0:0:0 -p long --mem $mem $logDir/job.sh $i" 
+            cmd="sbatch $dep --qos=testbump --parsable -c 1 -A rccg -o $logDir/slurm.$pass.$i.txt -J ${dFolder##*/}.$i -t 12-0:0:0 -p admin --mem $mem $logDir/job.sh $i" 
             echo Submitting job:
             echo $cmd | tee -a $logDir/readme
             output="$(eval $cmd)"
