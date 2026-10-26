@@ -14,7 +14,7 @@ function processFolder() {
 
     #local owner=$(stat -c '%U:%G' "$sDir")
     local owner=$(stat -c '%u:%g' "$sDir")
-    sudo chmod g+rwx "$dDir" && sudo chown $owner "$dDir"
+    sudo chmod g+rwx "$dDir" && sudo chown "$owner" "$dDir"
     sudo find  "$dDir" -maxdepth 1 -maxdepth 1 -type f | xargs -I {} -P 1 bash -c '
         sudo chmod ug+rw "$1"
         sudo chown "$2" "$1"
